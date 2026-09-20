@@ -5,7 +5,7 @@ let package = Package(
     platforms: [.macOS("26.0")],
     products: [.executable(name: "VibeStatistics", targets: ["VibeStatistics"])],
     targets: [
-        .executableTarget(name: "VibeStatistics", resources: [.copy("Resources/AgentLogos")], swiftSettings: [.swiftLanguageMode(.v5)]),
+        .executableTarget(name: "VibeStatistics", resources: [.copy("Resources/AgentLogos"), .copy("Resources/HomeIcons")], swiftSettings: [.swiftLanguageMode(.v5)]),
         .testTarget(name: "VibeStatisticsTests", dependencies: ["VibeStatistics"], path: "Tests/Swift")
     ]
 )

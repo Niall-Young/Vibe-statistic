@@ -60,7 +60,7 @@ import SwiftData
         popover.behavior = .transient
         popover.contentViewController = NSHostingController(rootView: MenuView(store: store, openWindow: { [weak self] in self?.showWindow() }))
         popover.contentSize = NSSize(width: 370, height: 630)
-        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1080, height: 810), styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView], backing: .buffered, defer: false)
+        window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1440, height: 900), styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView], backing: .buffered, defer: false)
         window.title = "Vibe Statistics"; window.titlebarAppearsTransparent = true
         window.contentViewController = NSHostingController(rootView: MainView(store: store))
         window.minSize = NSSize(width: 820, height: 650); window.center(); if !verifyMode { window.setFrameAutosaveName("MainWindow") }
