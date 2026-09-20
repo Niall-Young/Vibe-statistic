@@ -91,12 +91,14 @@ struct MetricRow: View {
                         Text("已用 \(used.formatted(.number.precision(.fractionLength(0...2)))) / \(total.formatted(.number.precision(.fractionLength(0...2))))\(metric.unit == "%" ? "" : " " + metric.unit)")
                     } else { Text(metric.kind == "balance" ? "账户余额" : "剩余额度") }
                     Spacer()
-                    if let reset = metric.resetAt {
-                        let date = Date(timeIntervalSince1970: reset)
-                        Text("\(metric.note == "套餐到期时间" ? "到期" : "重置") \(date.formatted(.dateTime.month().day().hour().minute()))")
-                            .help(metric.note ?? "服务返回的时间")
-                    }
                 }.font(.caption).foregroundStyle(.tertiary)
+            }
+            if let reset = metric.resetAt {
+                let date = Date(timeIntervalSince1970: reset)
+                Text("\(metric.note == "套餐到期时间" ? "到期" : "重置") \(date.formatted(.dateTime.month().day().hour().minute()))\(metric.note?.contains("估算") == true ? "（估算）" : "")")
+                    .font(compact ? .caption2 : .caption).foregroundStyle(.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                    .help(metric.note ?? "服务返回的时间，按本机时区显示")
             }
         }.accessibilityElement(children: .combine)
     }
@@ -414,14 +416,15 @@ struct MenuView: View {
                         } label: {
                             VStack(alignment: .leading, spacing: 10) {
                                 HStack { Label { Text(agent.name) } icon: { AgentLogo(agent: agent, size: 20) }.font(.subheadline.weight(.medium)); Spacer(); StatusLabel(store: store, agent: agent) }
-                                if let metric = store.snapshots[agent]?.metrics?.first {
-                                    MetricRow(metric: metric, compact: true)
-                                    if let reset = metric.resetAt {
-                                        Text("\(metric.note == "套餐到期时间" ? "到期" : "重置") \(Date(timeIntervalSince1970: reset).formatted(.dateTime.month().day().hour().minute()))").font(.caption2).foregroundStyle(.secondary)
+                                if let metrics = store.snapshots[agent]?.metrics, !metrics.isEmpty {
+                                    VStack(alignment: .leading, spacing: 14) {
+                                        ForEach(metrics) { metric in
+                                            MetricRow(metric: metric, compact: true)
+                                        }
                                     }
                                 } else { Text(store.errors[agent]?.message ?? "正在读取额度…").font(.caption).foregroundStyle(.secondary) }
                             }.padding(.horizontal, 18).padding(.vertical, 14).contentShape(Rectangle())
-                        }.buttonStyle(.plain).accessibilityElement(children: .ignore).accessibilityLabel("\(agent.name)，\(store.snapshots[agent]?.metrics?.first?.formatted ?? "暂无数据")，查看详情").accessibilityAddTraits(.isButton)
+                        }.buttonStyle(.plain).accessibilityElement(children: .combine).accessibilityHint("查看 \(agent.name) 详情")
                         if agent != Agent.allCases.last { Divider().padding(.horizontal, 18) }
                     }
                 }

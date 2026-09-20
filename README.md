@@ -13,7 +13,7 @@
 
 ### 核心能力
 
-- 菜单栏摘要、独立总览窗口、各 Agent 详情、7 / 30 天每日趋势、接入设置。
+- 菜单栏摘要、独立总览窗口、各 Agent 详情、7 / 30 天每日趋势、接入设置。菜单栏列出所有返回的额度窗口（包括 5 小时与每周）；菜单栏、总览和详情均显示服务提供的重置或到期时间，按本机时区显示，估算时间明确标注。
 - 五个只读适配器，保留官方单位、额度窗口、账户隔离与更新时间；缺失值不视为零。
 - 默认每 5 分钟刷新，支持 1 / 15 分钟；请求合并、失败退避、休眠暂停及唤醒刷新。
 - SwiftData 本地快照，默认保留 90 天，可改为 30 天；新增 Key / PAT 存入 macOS 钥匙串。
@@ -91,7 +91,7 @@ A personal SwiftUI + AppKit menu bar application for Codex, Kimi Code, Qoder CN 
 
 ### Features
 
-- Menu bar summary, overview window, provider details, 7 / 30-day daily observations, and connection settings.
+- Menu bar summary, overview window, provider details, 7 / 30-day daily observations, and connection settings. The menu lists every returned quota window, including five-hour and weekly limits. The menu, overview, and details show service-provided reset or expiry times in the local time zone, with estimated times explicitly labeled.
 - Five read-only adapters preserving official units, quota windows, account boundaries, and timestamps. Missing values are never treated as zero.
 - Five-minute refresh by default, with 1 / 15-minute options; request coalescing, retry backoff, sleep suspension, and wake refresh.
 - SwiftData snapshots retained for 90 days by default, optionally 30 days; additional keys / PATs stored in macOS Keychain.
