@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Read-only provider bridge. JSON stdin/stdout; never executes model prompts."""
 import contextlib, datetime, hashlib, json, math, os, pathlib, re, select, selectors
-import signal, socket, struct, subprocess, sys, tempfile, time, urllib.error, urllib.request
+import signal, socket, struct, subprocess, sys, tempfile, time, urllib.error, urllib.request, urllib.parse
 
 ROOT = pathlib.Path(__file__).resolve().parent
 HOME = pathlib.Path.home()
@@ -38,7 +38,8 @@ def child(args, **kw):
             try: os.killpg(p.pid, signal.SIGKILL)
             except ProcessLookupError: pass
             p.wait()
-        CHILDREN.remove(p)
+
+        if p in CHILDREN: CHILDREN.remove(p)
 
 def fingerprint(value): return hashlib.sha256(str(value).encode()).hexdigest()[:20]
 def number(value):
@@ -207,6 +208,44 @@ def qoder(cfg):
         if not data.get('userId'): raise QueryError('unavailable','Qoder CN 未返回账户额度')
         return snapshot('qoder',data['userId'],'官方 · Qoder CN SDK',parse_qoder(data),data.get('userType'))
 
+def local_deepseek_usage(root=None, now=None):
+    """Deduplicate streamed/copy messages by provider message ID; retain only usage fields."""
+    root=root or HOME/'.claude/projects'; now=now or time.time();cutoff=now-30*86400
+    messages={};incomplete=False
+    for path in root.glob('**/*.jsonl'):
+        try:
+            if path.stat().st_mtime<cutoff: continue
+            with path.open() as file:
+                for line in file:
+                    try: record=json.loads(line)
+                    except ValueError: incomplete=True;continue
+                    if record.get('type')!='assistant':continue
+                    msg=record.get('message') or {};model=msg.get('model','')
+                    if not model.startswith('deepseek'):continue
+                    stamp=epoch(record.get('timestamp'));ident=msg.get('id');usage=msg.get('usage')
+                    if stamp is None or stamp<cutoff or stamp>now or not usage:continue
+                    if not ident:incomplete=True;continue
+                    key=(model,ident)
+                    fields={'input':'input_tokens','output':'output_tokens','cacheRead':'cache_read_input_tokens','cacheWrite':'cache_creation_input_tokens'}
+                    values={k:number(usage.get(v)) for k,v in fields.items()}
+                    if values['input'] is None or values['output'] is None:incomplete=True;continue
+                    if any(v is not None and (v<0 or not v.is_integer()) for v in values.values()):incomplete=True;continue
+                    if key not in messages:messages[key]={'timestamp':stamp,**values}
+                    else:
+                        # Streaming fragments repeat cumulative usage, including copies in resumed sessions.
+                        for k,v in values.items():
+                            if v is not None:messages[key][k]=max(messages[key].get(k) or 0,v)
+        except (OSError,UnicodeError):incomplete=True
+    days={}
+    for record in messages.values():
+        day=datetime.datetime.fromtimestamp(record['timestamp']).strftime('%Y-%m-%d')
+        row=days.setdefault(day,dict(date=day,input=0,output=0,cacheRead=0,cacheWrite=0))
+        for field in ('input','output','cacheRead','cacheWrite'):
+            if record[field] is None:row[field]=None
+            elif row[field] is not None:row[field]+=int(record[field])
+    if not messages:return None
+    return dict(days=sorted(days.values(),key=lambda x:x['date']),messageCount=len(messages),incomplete=incomplete,scope='本机全部 DeepSeek 会话，不按 API Key 归因')
+
 def deepseek(cfg):
     secret=cfg.get('secret')
     if not secret:
@@ -224,7 +263,9 @@ def deepseek(cfg):
         metrics.append(metric(currency+'.balance','可用余额',b.get('total_balance'),currency,'balance',note='账户余额；变化不等于 Claude Code 支出'))
         metrics.append(metric(currency+'.granted','赠送余额',b.get('granted_balance'),currency,'balance'))
         metrics.append(metric(currency+'.topped','充值余额',b.get('topped_up_balance'),currency,'balance'))
-    return snapshot('deepseek',secret,'官方 · DeepSeek API（按 Key 隔离）',metrics,'按量付费')
+    result=snapshot('deepseek',secret,'官方 · DeepSeek API（按 Key 隔离）',metrics,'按量付费')
+    result['localUsage']=local_deepseek_usage()
+    return result
 
 def parse_agy(text,now=None):
     now=now or time.time();metrics=[];group=None;window=None
@@ -282,7 +323,21 @@ def antigravity(cfg):
             identity=match.group(1) if match else None
             if not identity: raise QueryError('auth','Antigravity 未返回账户身份')
             plan=re.search(r'\((Google AI [^)]+)\)',initial)
-            return snapshot('antigravity',identity,'官方 CLI · Antigravity /usage',metrics,plan.group(1) if plan else None)
+            os.write(master,b'\x1b');read(.4);os.write(master,b'/credits');read(.3);os.write(master,b'\r')
+            credit_text='';notices=[]
+            deadline=time.monotonic()+8
+            while time.monotonic()<deadline:
+                credit_text=read(.4)
+                if 'Remaining AI Credits:' in credit_text: break
+            credit_match=re.search(r'Remaining AI Credits:\s*([\d,]+(?:\.\d+)?)',credit_text)
+            if credit_match: metrics.append(metric('ai.credits','AI Credits',credit_match.group(1).replace(',',''),'Credits','balance'))
+            elif 'AI Credits not enabled' in credit_text: notices.append('AI Credits 未启用，未修改官方计费设置。')
+            else: notices.append('AI Credits 暂不可用；模型额度已读取。')
+            result=snapshot('antigravity',identity,'官方 CLI · Antigravity /usage · /credits',metrics,plan.group(1) if plan else None)
+            result['notices']=notices
+            version=re.search(r'Antigravity CLI ([0-9]+\.[0-9]+\.[0-9]+)',initial)
+            result['cliVersion']=version.group(1) if version else None
+            return result
     finally:
         os.close(master)
         if slave is not None: os.close(slave)
@@ -295,6 +350,14 @@ def main():
     work.mkdir(parents=True,exist_ok=True);cfg['cwd']=str(work)
     try:
         result={'codex':codex,'kimi':kimi,'qoder':qoder,'deepseek':deepseek,'antigravity':antigravity}[provider](cfg)
+        if result.get('status')=='ok' and provider in ('codex','kimi','qoder'):
+            fallback={'codex':'~/.local/bin/codex','kimi':'~/.kimi-code/bin/kimi','qoder':'~/.qoder-cn/entry/qodercn'}[provider]
+            try:
+                with child([resolve(cfg.get('path'),fallback),'--version'],stdout=subprocess.PIPE,stderr=subprocess.DEVNULL) as p:
+                    out,_=p.communicate(timeout=3)
+                    version=re.search(r'[0-9]+\.[0-9]+\.[0-9]+',out.decode(errors='replace'))
+                    result['cliVersion']=version.group(0) if version else None
+            except (QueryError,subprocess.TimeoutExpired): pass
     except QueryError as e: result=dict(provider=provider,status='error',errorCode=e.code,message=e.message)
     except Exception: result=dict(provider=provider,status='error',errorCode='format',message='查询未完成，请检查登录、CLI 路径或版本')
     finally: cleanup()
