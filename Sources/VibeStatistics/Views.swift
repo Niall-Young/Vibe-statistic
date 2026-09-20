@@ -375,6 +375,13 @@ struct CredentialRow: View {
                         do { try Keychain.save(secret.trimmingCharacters(in: .whitespacesAndNewlines), for: agent); secret = ""; saved = true; error = nil; store.reconnect(agent) }
                         catch { self.error = "钥匙串保存失败" }
                     }.disabled(secret.isEmpty)
+                    Button("授权读取凭据") {
+                        do {
+                            saved = try Keychain.read(agent, allowInteraction: true) != nil
+                            error = saved ? nil : "未找到已保存凭据，可填写后存入钥匙串"
+                            store.reconnect(agent)
+                        } catch { self.error = "未获准读取凭据；自动刷新不会弹窗" }
+                    }
                     if saved {
                         Text("已保存").font(.caption).foregroundStyle(.green)
                         Button("移除") { do { try Keychain.save("", for: agent); saved = false; store.reconnect(agent) } catch { self.error = "钥匙串移除失败" } }
@@ -383,7 +390,7 @@ struct CredentialRow: View {
             }
             HStack { Link("官方账户页面 ↗", destination: agent.portal); Button("检查连接") { store.refresh(agent) }.disabled(store.refreshing.contains(agent)) }
             if let error { Text(error).font(.caption).foregroundStyle(.orange) }
-        }.padding(.vertical, 8).onAppear { path = store.path(agent); saved = Keychain.read(agent) != nil }
+        }.padding(.vertical, 8).onAppear { path = store.path(agent); saved = (try? Keychain.read(agent)) != nil }
     }
     func savePath() { UserDefaults.standard.set(path, forKey: "path.\(agent.rawValue)"); store.reconnect(agent) }
 }

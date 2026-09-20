@@ -76,7 +76,13 @@ import SwiftUI
             let ticket = generation
             let path = path(agent)
             let node = UserDefaults.standard.string(forKey: "nodePath") ?? "/opt/homebrew/bin/node"
-            let secret = [.deepseek, .qoder].contains(agent) ? Keychain.read(agent) : nil
+            let secret: String?
+            do { secret = [.deepseek, .qoder].contains(agent) ? try Keychain.read(agent) : nil }
+            catch {
+                accept(.failure(agent, code: "keychain", message: "凭据需要授权，请在设置中点击「授权读取凭据」；自动刷新不会弹窗"), for: agent)
+                refreshing.remove(agent)
+                continue
+            }
             jobs[agent] = Task { [weak self, provider] in
                 let result = await provider.fetch(agent, path: path, node: node, secret: secret)
                 guard !Task.isCancelled, let self, self.generation == ticket else { return }

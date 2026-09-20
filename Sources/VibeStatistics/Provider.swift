@@ -67,15 +67,17 @@ extension UsageSnapshot {
     }
 }
 
-enum Keychain {
+@MainActor enum Keychain {
+    static let reader = CredentialReader()
     static let service = "com.vibestatistics.credentials"
-    static func read(_ agent: Agent) -> String? {
-        let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service, kSecAttrAccount as String: agent.rawValue, kSecReturnData as String: true, kSecMatchLimit as String: kSecMatchLimitOne]
-        var result: CFTypeRef?
-        guard SecItemCopyMatching(query as CFDictionary, &result) == errSecSuccess, let data = result as? Data else { return nil }
-        return String(data: data, encoding: .utf8)
+    static func read(_ agent: Agent, allowInteraction: Bool = false) throws -> String? {
+        try reader.read(agent, allowInteraction: allowInteraction)
     }
     static func save(_ value: String, for agent: Agent) throws {
+        try persist(value, for: agent)
+        reader.cache[agent] = value.isEmpty ? nil : value
+    }
+    private static func persist(_ value: String, for agent: Agent) throws {
         let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service, kSecAttrAccount as String: agent.rawValue]
         if value.isEmpty {
             let code = SecItemDelete(query as CFDictionary)
@@ -90,5 +92,30 @@ enum Keychain {
             let code = SecItemAdd(insert as CFDictionary, nil)
             guard code == errSecSuccess else { throw NSError(domain: NSOSStatusErrorDomain, code: Int(code)) }
         } else if status != errSecSuccess { throw NSError(domain: NSOSStatusErrorDomain, code: Int(status)) }
+    }
+}
+
+/// Credentials stay in memory only; polling never requests system authentication UI.
+@MainActor final class CredentialReader {
+    var cache: [Agent: String] = [:]
+    let lookup: ([String: Any]) -> (OSStatus, Data?)
+    init(lookup: @escaping ([String: Any]) -> (OSStatus, Data?) = { query in
+        var result: CFTypeRef?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+        return (status, result as? Data)
+    }) { self.lookup = lookup }
+    func read(_ agent: Agent, allowInteraction: Bool = false) throws -> String? {
+        if let value = cache[agent] { return value }
+        let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: Keychain.service, kSecAttrAccount as String: agent.rawValue,
+            kSecReturnData as String: true, kSecMatchLimit as String: kSecMatchLimitOne,
+            kSecUseAuthenticationUI as String: allowInteraction ? kSecUseAuthenticationUIAllow : kSecUseAuthenticationUIFail]
+        let (status, data) = lookup(query)
+        if status == errSecItemNotFound { return nil }
+        guard status == errSecSuccess, let data, let value = String(data: data, encoding: .utf8) else {
+            throw NSError(domain: NSOSStatusErrorDomain, code: Int(status == errSecSuccess ? errSecDecode : status))
+        }
+        cache[agent] = value
+        return value
     }
 }
