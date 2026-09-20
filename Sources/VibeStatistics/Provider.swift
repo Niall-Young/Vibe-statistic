@@ -75,7 +75,7 @@ extension UsageSnapshot {
     }
     static func save(_ value: String, for agent: Agent) throws {
         try persist(value, for: agent)
-        reader.cache[agent] = value.isEmpty ? nil : value
+        reader.didSave(value, for: agent)
     }
     private static func persist(_ value: String, for agent: Agent) throws {
         let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service, kSecAttrAccount as String: agent.rawValue]
@@ -97,7 +97,14 @@ extension UsageSnapshot {
 
 /// Credentials stay in memory only; polling never requests system authentication UI.
 @MainActor final class CredentialReader {
-    var cache: [Agent: String] = [:]
+    private(set) var cache: [Agent: String] = [:]
+    private var failures: [Agent: OSStatus] = [:]
+    private var missing: Set<Agent> = []
+    func didSave(_ value: String, for agent: Agent) {
+        cache[agent] = value.isEmpty ? nil : value
+        failures.removeValue(forKey: agent)
+        if value.isEmpty { missing.insert(agent) } else { missing.remove(agent) }
+    }
     let lookup: ([String: Any]) -> (OSStatus, Data?)
     init(lookup: @escaping ([String: Any]) -> (OSStatus, Data?) = { query in
         var result: CFTypeRef?
@@ -106,15 +113,35 @@ extension UsageSnapshot {
     }) { self.lookup = lookup }
     func read(_ agent: Agent, allowInteraction: Bool = false) throws -> String? {
         if let value = cache[agent] { return value }
+        if !allowInteraction {
+            if let status = failures[agent] { throw NSError(domain: NSOSStatusErrorDomain, code: Int(status)) }
+            if missing.contains(agent) { return nil }
+        }
+        // These credentials live in the legacy login keychain. The per-query UI
+        // flag alone only suppresses Data Protection keychain authentication.
+        // Keep this synchronous and MainActor-isolated so no app keychain call
+        // can interleave while the process-wide legacy UI flag is changed.
+        var previous: DarwinBoolean = false
+        let getStatus = SecKeychainGetUserInteractionAllowed(&previous)
+        guard getStatus == errSecSuccess else { throw NSError(domain: NSOSStatusErrorDomain, code: Int(getStatus)) }
+        let setStatus = SecKeychainSetUserInteractionAllowed(allowInteraction)
+        guard setStatus == errSecSuccess else { throw NSError(domain: NSOSStatusErrorDomain, code: Int(setStatus)) }
+        defer { SecKeychainSetUserInteractionAllowed(previous.boolValue) }
         let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: Keychain.service, kSecAttrAccount as String: agent.rawValue,
             kSecReturnData as String: true, kSecMatchLimit as String: kSecMatchLimitOne,
             kSecUseAuthenticationUI as String: allowInteraction ? kSecUseAuthenticationUIAllow : kSecUseAuthenticationUIFail]
         let (status, data) = lookup(query)
-        if status == errSecItemNotFound { return nil }
-        guard status == errSecSuccess, let data, let value = String(data: data, encoding: .utf8) else {
-            throw NSError(domain: NSOSStatusErrorDomain, code: Int(status == errSecSuccess ? errSecDecode : status))
+        if status == errSecItemNotFound {
+            failures.removeValue(forKey: agent); missing.insert(agent)
+            return nil
         }
+        guard status == errSecSuccess, let data, let value = String(data: data, encoding: .utf8) else {
+            let failure = status == errSecSuccess ? errSecDecode : status
+            failures[agent] = failure
+            throw NSError(domain: NSOSStatusErrorDomain, code: Int(failure))
+        }
+        failures.removeValue(forKey: agent); missing.remove(agent)
         cache[agent] = value
         return value
     }
