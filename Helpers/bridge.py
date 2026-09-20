@@ -26,8 +26,22 @@ def terminate(*_):
     cleanup()
     raise QueryError('cancelled', '查询已取消')
 
+def query_workspace():
+    work = HOME/'Library/Application Support/VibeStatistics/QueryWorkspace'
+    work.mkdir(parents=True, exist_ok=True)
+    return work
+
 @contextlib.contextmanager
 def child(args, **kw):
+    # Metadata-only CLIs must not discover an ancestor repository (e.g. ~/.git)
+    # and scan personal folders while collecting startup Git context.
+    work = query_workspace()
+    kw.setdefault('cwd', str(work))
+    env = dict(kw.get('env', os.environ))
+    for key in list(env):
+        if key.startswith('GIT_'): del env[key]
+    env['GIT_CEILING_DIRECTORIES'] = str(work.parent)
+    kw['env'] = env
     p = subprocess.Popen(args, start_new_session=True, **kw); CHILDREN.append(p)
     try: yield p
     finally:
@@ -346,8 +360,7 @@ def main():
     signal.signal(signal.SIGTERM,terminate);signal.signal(signal.SIGINT,terminate)
     cfg=json.load(sys.stdin);provider=cfg.get('provider')
     # Stable empty directory used exclusively for metadata-only CLI processes.
-    work=HOME/'Library/Application Support/VibeStatistics/QueryWorkspace'
-    work.mkdir(parents=True,exist_ok=True);cfg['cwd']=str(work)
+    cfg['cwd']=str(query_workspace())
     try:
         result={'codex':codex,'kimi':kimi,'qoder':qoder,'deepseek':deepseek,'antigravity':antigravity}[provider](cfg)
         if result.get('status')=='ok' and provider in ('codex','kimi','qoder'):

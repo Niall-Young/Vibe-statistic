@@ -85,3 +85,27 @@ class LocalUsageTests(unittest.TestCase):
             self.assertEqual(result['days'][0]['input'],200)
             self.assertIsNone(result['days'][0]['cacheWrite'])
             self.assertFalse(result['incomplete'])
+
+class WorkspaceIsolationTests(unittest.TestCase):
+    def test_cli_and_version_probe_cannot_discover_home_repository(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as d:
+            home = pathlib.Path(d)
+            subprocess.run(['/usr/bin/git', 'init', '-q', str(home)], check=True)
+            with patch.object(b, 'HOME', home):
+                work = b.query_workspace()
+                # Reproduce the original bug without enumerating any personal files.
+                original = subprocess.run(['/usr/bin/git', 'rev-parse', '--show-toplevel'], cwd=work, capture_output=True)
+                self.assertEqual(original.returncode, 0)
+                for explicit_cwd in (False, True):
+                    options = {'cwd': str(work)} if explicit_cwd else {}
+                    inherited = dict(os.environ, GIT_DIR=str(home/'.git'), GIT_WORK_TREE=str(home), TERM='xterm')
+                    with b.child(['/usr/bin/git', 'rev-parse', '--show-toplevel'], env=inherited,
+                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE, **options) as process:
+                        out, _ = process.communicate(timeout=3)
+                        self.assertNotEqual(process.returncode, 0)
+                        self.assertEqual(out, b'')
+                with b.child(['/usr/bin/python3', '-c', 'import os; print(os.getcwd()); print(os.environ["TERM"])'],
+                             env=dict(os.environ, TERM='xterm'), stdout=subprocess.PIPE) as process:
+                    out, _ = process.communicate(timeout=3)
+                    self.assertEqual(out.decode().splitlines(), [str(work.resolve()), 'xterm'])

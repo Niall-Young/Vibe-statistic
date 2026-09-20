@@ -35,6 +35,10 @@ struct CLIProvider: UsageProvider {
                 if let secret, !secret.isEmpty { config["secret"] = secret }
                 defer { ProcessRegistry.shared.remove(id) }
                 do {
+                    let work = FileManager.default.homeDirectoryForCurrentUser
+                        .appendingPathComponent("Library/Application Support/VibeStatistics/QueryWorkspace", isDirectory: true)
+                    try FileManager.default.createDirectory(at: work, withIntermediateDirectories: true)
+                    process.currentDirectoryURL = work
                     try process.run(); ProcessRegistry.shared.add(process, id: id)
                     try input.fileHandleForWriting.write(contentsOf: JSONEncoder().encode(config))
                     try input.fileHandleForWriting.close()
