@@ -1,0 +1,8 @@
+{
+  "name": "vibe-statistics-bridge",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@qodercn-ai/qodercn-agent-sdk": "1.0.45"
+  }
+}

@@ -1,0 +1,303 @@
+#!/usr/bin/env python3
+"""Read-only provider bridge. JSON stdin/stdout; never executes model prompts."""
+import contextlib, datetime, hashlib, json, math, os, pathlib, re, select, selectors
+import signal, socket, struct, subprocess, sys, tempfile, time, urllib.error, urllib.request
+
+ROOT = pathlib.Path(__file__).resolve().parent
+HOME = pathlib.Path.home()
+sys.path.insert(0, str(ROOT / 'vendor'))
+CHILDREN = []
+
+class QueryError(Exception):
+    def __init__(self, code, message): self.code, self.message = code, message
+
+def cleanup(*_):
+    for p in list(CHILDREN):
+        try: os.killpg(p.pid, signal.SIGTERM)
+        except ProcessLookupError: pass
+    for p in list(CHILDREN):
+        try: p.wait(timeout=1)
+        except subprocess.TimeoutExpired:
+            try: os.killpg(p.pid, signal.SIGKILL); p.wait(timeout=1)
+            except (ProcessLookupError, subprocess.TimeoutExpired): pass
+    CHILDREN.clear()
+
+def terminate(*_):
+    cleanup()
+    raise QueryError('cancelled', '查询已取消')
+
+@contextlib.contextmanager
+def child(args, **kw):
+    p = subprocess.Popen(args, start_new_session=True, **kw); CHILDREN.append(p)
+    try: yield p
+    finally:
+        try: os.killpg(p.pid, signal.SIGTERM)
+        except ProcessLookupError: pass
+        try: p.wait(timeout=2)
+        except subprocess.TimeoutExpired:
+            try: os.killpg(p.pid, signal.SIGKILL)
+            except ProcessLookupError: pass
+            p.wait()
+        CHILDREN.remove(p)
+
+def fingerprint(value): return hashlib.sha256(str(value).encode()).hexdigest()[:20]
+def number(value):
+    if value is None or isinstance(value, bool): return None
+    try:
+        x = float(value)
+        return x if math.isfinite(x) else None
+    except (ValueError, TypeError): return None
+
+def epoch(value):
+    if isinstance(value, (float,int)): return value / 1000 if value > 1e11 else value
+    if not value: return None
+    try: return datetime.datetime.fromisoformat(value.replace('Z','+00:00')).timestamp()
+    except (ValueError,TypeError): return None
+
+def metric(key,title,value,unit='%',kind='quota',used=None,total=None,reset=None,note=None):
+    v=number(value)
+    if v is None: return None
+    if unit=='%' and not 0 <= v <= 100: raise QueryError('format','服务返回的百分比超出范围')
+    return dict(id=key,title=title,value=v,unit=unit,kind=kind,used=number(used),total=number(total),resetAt=epoch(reset),note=note)
+
+def snapshot(provider, account, source, metrics, plan=None):
+    metrics=[m for m in metrics if m is not None]
+    if not metrics: raise QueryError('unavailable','服务未返回可用额度，请检查登录或 CLI 版本')
+    return dict(provider=provider,account=fingerprint(account),source=source,metrics=metrics,plan=plan,collectedAt=time.time(),status='ok')
+
+def get(url, key=None, local=False):
+    opener=urllib.request.build_opener(urllib.request.ProxyHandler({})) if local else urllib.request.build_opener()
+    req=urllib.request.Request(url,headers={'Authorization':'Bearer '+key} if key else {})
+    try:
+        with opener.open(req,timeout=18) as r: return json.load(r)
+    except urllib.error.HTTPError as e:
+        if e.code in (401,403): raise QueryError('auth','登录已过期或权限不足，请重新授权')
+        if e.code==429: raise QueryError('rateLimited','查询受到限流，稍后自动重试')
+        raise QueryError('network','服务暂不可用（HTTP %s）'%e.code)
+    except (urllib.error.URLError,TimeoutError): raise QueryError('network','无法连接服务，请检查网络或本地 CLI')
+
+def resolve(path, fallback):
+    p=os.path.expanduser(path or fallback)
+    if not os.path.isfile(p) or not os.access(p,os.X_OK): raise QueryError('missingCLI','未找到可执行 CLI，请在设置中选择路径')
+    return p
+
+class RPC:
+    def __init__(self,p):
+        self.p=p;self.buf=b'';self.next_id=0
+    def send(self,obj): self.p.stdin.write((json.dumps(obj)+'\n').encode());self.p.stdin.flush()
+    def call(self,method,params=None):
+        self.next_id+=1;ident=self.next_id
+        self.send(dict(id=ident,method=method,params=params or {}));deadline=time.monotonic()+22
+        while time.monotonic()<deadline:
+            if b'\n' not in self.buf:
+                if not select.select([self.p.stdout],[],[],.3)[0]: continue
+                data=os.read(self.p.stdout.fileno(),65536)
+                if not data: raise QueryError('process','CLI 提前退出，请检查版本和登录')
+                self.buf+=data
+            while b'\n' in self.buf:
+                line,self.buf=self.buf.split(b'\n',1)
+                try: obj=json.loads(line)
+                except ValueError: continue
+                if obj.get('id')==ident:
+                    if 'error' in obj: raise QueryError('auth','Codex 查询失败，请检查登录与 CLI 版本')
+                    return obj.get('result',{})
+        raise QueryError('timeout','CLI 查询超时')
+
+def parse_codex(data):
+    buckets=data.get('rateLimitsByLimitId')
+    if not buckets: buckets={'codex': data.get('rateLimits') or {}}
+    metrics=[];plan=None
+    for key,b in buckets.items():
+        plan=b.get('planType') or plan
+        for window in ('primary','secondary'):
+            w=b.get(window) or {};used=number(w.get('usedPercent'))
+            if used is None: continue
+            mins=w.get('windowDurationMins');label={300:'5 小时',10080:'每周'}.get(mins,('%s 分钟'%mins) if mins else window)
+            metrics.append(metric(key+'.'+window,(b.get('limitName') or 'Codex')+' · '+label,100-used,used=used,total=100,reset=w.get('resetsAt')))
+        credits=b.get('credits') or {}
+        if credits.get('balance') is not None:
+            metrics.append(metric(key+'.credits','附加 Credits',credits['balance'],'Credits','balance'))
+    return metrics,plan
+
+def codex(cfg):
+    path=resolve(cfg.get('path'),'~/.local/bin/codex')
+    with child([path,'app-server','--stdio'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,cwd=cfg['cwd']) as p:
+        rpc=RPC(p);rpc.call('initialize',{'clientInfo':{'name':'vibe_statistics','version':'0.1.0'},'capabilities':{'experimentalApi':True}})
+        rpc.send({'method':'initialized'})
+        account=rpc.call('account/read',{'refreshToken':False}).get('account') or {}
+        data=rpc.call('account/rateLimits/read');metrics,plan=parse_codex(data)
+        identity=data.get('accountId') or account.get('email')
+        if not identity: raise QueryError('auth','Codex 未返回账户身份，请登录 ChatGPT 账户')
+        return snapshot('codex',identity,'官方 · Codex app-server',metrics,plan)
+
+def parse_kimi(data):
+    if data.get('kind')=='error': raise QueryError('auth' if data.get('status') in (401,403) else 'network','Kimi 额度查询失败，请检查登录或稍后刷新')
+    metrics=[]
+    if 'quota' in data:
+        q=data.get('quota') or {}
+        for key,v in (q.get('usages') or {}).items():
+            used=number(v.get('usedRatio'))
+            if used is not None: metrics.append(metric(key,{'limit5h':'5 小时','limit7d':'每周','monthTotal':'月度总额度','monthCode':'月度代码额度'}.get(key,key),100-used*100,used=used*100,total=100,reset=v.get('resetAt')))
+        wallet=q.get('extraUsage')
+        if wallet:
+            balance=number(wallet.get('balanceCents'))
+            metrics.append(metric('wallet','额外用量余额',balance/100 if balance is not None else None,wallet.get('currency') or 'CNY','balance'))
+    else:
+        entries=([data['summary']] if data.get('summary') else [])+(data.get('limits') or [])
+        for v in entries:
+            w=v.get('window') or {};key=str(w.get('duration'))+str(w.get('unit'));limit=number(v.get('limit'));used=number(v.get('used'))
+            label={'1week':'每周','5hour':'5 小时'}.get(key,key)
+            if limit is not None and limit>0 and used is not None: metrics.append(metric(key,label,100*(1-used/limit),used=used,total=limit,reset=v.get('reset_at')))
+        wallet=data.get('extra_usage')
+        if wallet:
+            balance=number(wallet.get('balance_cents'))
+            metrics.append(metric('wallet','额外用量余额',balance/100 if balance is not None else None,wallet.get('currency') or 'CNY','balance'))
+    return metrics
+
+def kimi_at(port):
+    token=(HOME/'.kimi-code/server.token').read_text().strip();base='http://127.0.0.1:'+str(port)+'/api/v1/'
+    # Require Kimi's envelope before sending authenticated requests to a discovered local port.
+    health=get(base+'healthz',local=True)
+    if health.get('data',{}).get('ok') is not True: raise QueryError('network','Kimi 本地服务身份检查失败')
+    result=get(base+'oauth/usage',token,local=True)
+    if result.get('code')!=0: raise QueryError('auth','Kimi 登录或额度查询失败')
+    identity=get(base+'oauth/userinfo',token,local=True)
+    info=identity.get('data',{});user=info.get('userInfo') or info.get('user_info') or info
+    ident=user.get('userId') or user.get('user_id')
+    if not ident: raise QueryError('auth','Kimi 未返回账户身份，请重新登录')
+    return snapshot('kimi',ident,'官方 · Kimi 本地 Server',parse_kimi(result['data']),user.get('userLevelName'))
+
+def kimi(cfg):
+    path=resolve(cfg.get('path'),'~/.kimi-code/bin/kimi')
+    for f in (HOME/'.kimi-code/server/instances').glob('*.json'):
+        try:
+            inst=json.loads(f.read_text())
+            if inst.get('host') in ('127.0.0.1','localhost'): return kimi_at(int(inst['port']))
+        except (QueryError,OSError,ValueError,KeyError): pass
+    sock=socket.socket();sock.bind(('127.0.0.1',0));port=sock.getsockname()[1];sock.close()
+    with child([path,'web','--no-open','--host','127.0.0.1','--port',str(port)],stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL,cwd=cfg['cwd']) as p:
+        deadline=time.monotonic()+18
+        while time.monotonic()<deadline:
+            if p.poll() is not None: raise QueryError('process','Kimi Server 未能启动')
+            try:
+                get(f'http://127.0.0.1:{port}/api/v1/healthz',local=True);break
+            except QueryError: time.sleep(.4)
+        return kimi_at(port)
+
+def parse_qoder(data):
+    metrics=[]
+    for key,title in [('userQuota','套餐 Credits'),('addOnQuota','附加 Credits'),('orgResourcePackage','组织 Credits')]:
+        q=data.get(key) or {};total=q.get('total',q.get('cap'))
+        metrics.append(metric(key,title,q.get('remaining'),'Credits','quota',used=q.get('used'),total=total,reset=data.get('expiresAt') if key=='userQuota' else None,note='套餐到期时间' if key=='userQuota' else None))
+    return metrics
+
+def qoder(cfg):
+    path=resolve(cfg.get('path'),'~/.qoder-cn/entry/qodercn')
+    # The SDK expects the CLI runtime, not Qoder's shell/IDE dispatcher.
+    if pathlib.Path(path).name in ('qodercn','qoder-cn'):
+        candidates=[HOME/'.local/bin/qoderclicn',HOME/'.qoder-cn/bin/qoderclicn/qoderclicn']
+        path=next((str(x) for x in candidates if x.is_file() and os.access(x,os.X_OK)),path)
+    node=resolve(cfg.get('node'),'/opt/homebrew/bin/node')
+    with child([node,str(ROOT/'qoder.mjs')],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,cwd=cfg['cwd']) as p:
+        try: out,_=p.communicate(json.dumps(dict(path=path,cwd=cfg['cwd'],secret=cfg.get('secret'))).encode(),timeout=35)
+        except subprocess.TimeoutExpired: raise QueryError('timeout','Qoder CN 查询超时')
+        try: data=json.loads(out)
+        except ValueError: raise QueryError('format','Qoder CN 返回了无法识别的数据')
+        if not data or data.get('error'): raise QueryError('auth','Qoder CN 查询失败，请检查登录或提供 PAT')
+        if not data.get('userId'): raise QueryError('unavailable','Qoder CN 未返回账户额度')
+        return snapshot('qoder',data['userId'],'官方 · Qoder CN SDK',parse_qoder(data),data.get('userType'))
+
+def deepseek(cfg):
+    secret=cfg.get('secret')
+    if not secret:
+        try:
+            env=json.loads((HOME/'.claude/settings.json').read_text()).get('env',{})
+            if urllib.parse.urlparse(env.get('ANTHROPIC_BASE_URL','')).hostname!='api.deepseek.com': raise QueryError('auth','Claude Code 未配置 DeepSeek 官方服务，请填入官方 API Key')
+            secret=env.get('ANTHROPIC_AUTH_TOKEN') or env.get('ANTHROPIC_API_KEY')
+        except (OSError,ValueError): pass
+    if not secret: raise QueryError('auth','请在设置中添加 DeepSeek API Key')
+    data=get('https://api.deepseek.com/user/balance',secret)
+    metrics=[]
+    for b in data.get('balance_infos',[]):
+        currency=b.get('currency')
+        if currency not in ('CNY','USD'): continue
+        metrics.append(metric(currency+'.balance','可用余额',b.get('total_balance'),currency,'balance',note='账户余额；变化不等于 Claude Code 支出'))
+        metrics.append(metric(currency+'.granted','赠送余额',b.get('granted_balance'),currency,'balance'))
+        metrics.append(metric(currency+'.topped','充值余额',b.get('topped_up_balance'),currency,'balance'))
+    return snapshot('deepseek',secret,'官方 · DeepSeek API（按 Key 隔离）',metrics,'按量付费')
+
+def parse_agy(text,now=None):
+    now=now or time.time();metrics=[];group=None;window=None
+    lines=text.splitlines()
+    for i,line in enumerate(lines):
+        if line.strip() in ('GEMINI MODELS','CLAUDE AND GPT MODELS'): group=line.strip();window=None
+        if 'Weekly Limit Remaining' in line: window='weekly'
+        if 'Five Hour Limit Remaining' in line: window='5h'
+        m=re.search(r'(\d+(?:\.\d+)?)%',line)
+        if group and window and m:
+            reset=None;note=None
+            following=lines[i+1] if i+1<len(lines) else ''
+            duration=re.search(r'Refreshes in (?:(\d+)h\s*)?(?:(\d+)m)?',following)
+            if duration:
+                reset=now+int(duration.group(1) or 0)*3600+int(duration.group(2) or 0)*60;note='重置时间由 CLI 倒计时估算'
+            title=('Gemini' if group=='GEMINI MODELS' else 'Claude / GPT')+' · '+('每周' if window=='weekly' else '5 小时')
+            metrics.append(metric(group+'.'+window,title,m.group(1),reset=reset,note=note));window=None
+    return metrics
+
+def antigravity(cfg):
+    import pty,fcntl,termios,pyte
+    path=resolve(cfg.get('path'),'~/.local/bin/agy')
+    master,slave=pty.openpty();fcntl.ioctl(slave,termios.TIOCSWINSZ,struct.pack('HHHH',100,160,0,0))
+    screen=pyte.Screen(160,100);stream=pyte.Stream(screen);env=dict(os.environ,TERM='xterm-256color')
+    try:
+        with child([path],stdin=slave,stdout=slave,stderr=slave,cwd=cfg['cwd'],env=env) as p:
+            os.close(slave);slave=None
+            def read(duration):
+                end=time.monotonic()+duration
+                while time.monotonic()<end:
+                    if select.select([master],[],[],.1)[0]:
+                        try: data=os.read(master,65536)
+                        except OSError: break
+                        if not data: break
+                        stream.feed(data.decode(errors='replace'))
+                        if b'\x1b[6n' in data: os.write(master,b'\x1b[1;1R')
+                return '\n'.join(screen.display)
+            deadline=time.monotonic()+20;trusted=False;initial=''
+            while time.monotonic()<deadline:
+                initial=read(.4)
+                if 'Do you trust the contents of this project?' in initial and not trusted:
+                    # Only the app-owned, empty query workspace is trusted, never a user project.
+                    os.write(master,b'\r');trusted=True;continue
+                if '? for shortcuts' in initial and re.search(r'[\w.+-]+@[\w.-]+',initial): break
+                if p.poll() is not None: raise QueryError('process','Antigravity CLI 提前退出')
+            else: raise QueryError('auth','请先在 Antigravity CLI 中完成登录')
+            os.write(master,b'/usage');read(.3);os.write(master,b'\r')
+            deadline=time.monotonic()+18;text=''
+            while time.monotonic()<deadline:
+                text=read(.5)
+                metrics=parse_agy(text)
+                if len(metrics)>=4: break
+            else: raise QueryError('format','Antigravity 额度面板未识别，请检查 CLI 版本')
+            match=re.search(r'Account:\s*([^\s]+)',text)
+            identity=match.group(1) if match else None
+            if not identity: raise QueryError('auth','Antigravity 未返回账户身份')
+            plan=re.search(r'\((Google AI [^)]+)\)',initial)
+            return snapshot('antigravity',identity,'官方 CLI · Antigravity /usage',metrics,plan.group(1) if plan else None)
+    finally:
+        os.close(master)
+        if slave is not None: os.close(slave)
+
+def main():
+    signal.signal(signal.SIGTERM,terminate);signal.signal(signal.SIGINT,terminate)
+    cfg=json.load(sys.stdin);provider=cfg.get('provider')
+    # Stable empty directory used exclusively for metadata-only CLI processes.
+    work=HOME/'Library/Application Support/VibeStatistics/QueryWorkspace'
+    work.mkdir(parents=True,exist_ok=True);cfg['cwd']=str(work)
+    try:
+        result={'codex':codex,'kimi':kimi,'qoder':qoder,'deepseek':deepseek,'antigravity':antigravity}[provider](cfg)
+    except QueryError as e: result=dict(provider=provider,status='error',errorCode=e.code,message=e.message)
+    except Exception: result=dict(provider=provider,status='error',errorCode='format',message='查询未完成，请检查登录、CLI 路径或版本')
+    finally: cleanup()
+    print(json.dumps(result,ensure_ascii=False,allow_nan=False))
+
+if __name__=='__main__': main()

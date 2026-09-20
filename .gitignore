@@ -1,0 +1,7 @@
+/.build/
+/dist/
+/.local/
+/Helpers/node_modules/
+**/__pycache__/
+.DS_Store
+/Helpers/vendor/
