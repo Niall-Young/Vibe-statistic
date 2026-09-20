@@ -57,7 +57,8 @@ struct MainView: View {
                             ForEach(Agent.allCases) { agent in
                                 Button { store.selection = agent.rawValue } label: {
                                     HStack(spacing: 8) {
-                                        AgentLogo(agent: agent, size: 24).saturation(0)
+                                        AgentLogo(agent: agent, size: 24)
+                                            .saturation(store.selection == agent.rawValue ? 1 : 0)
                                             .overlay(RoundedRectangle(cornerRadius: 8).stroke(HomeStyle.border))
                                         Text(agent.name)
                                         Spacer(minLength: 0)
@@ -155,11 +156,13 @@ private struct WindowDragArea: NSViewRepresentable {
 
 private struct SidebarRowStyle: ViewModifier {
     let selected: Bool
+    @State private var hovering = false
     func body(content: Content) -> some View {
         content.font(.system(size: 14)).foregroundStyle(selected ? HomeStyle.text : HomeStyle.subtle)
             .padding(.horizontal, 12).padding(.vertical, 8).frame(maxWidth: .infinity)
-            .background(selected ? HomeStyle.fill : .clear, in: RoundedRectangle(cornerRadius: 8))
+            .background(selected || hovering ? HomeStyle.fill : .clear, in: RoundedRectangle(cornerRadius: 8))
             .contentShape(Rectangle())
+            .onHover { hovering = $0 }
     }
 }
 

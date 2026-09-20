@@ -39,12 +39,7 @@ struct AgentLogo: View {
                 Image(nsImage: image).resizable().renderingMode(.original).scaledToFit()
             }
         }
-        .frame(width: size * (agent == .deepseek ? 0.82 : 0.72), height: size * 0.72)
-        // Center Kimi's K optically; the detached blue dot skews its artwork bounds.
-        .offset(x: agent == .kimi ? size * 0.07 : 0,
-                y: agent == .kimi ? -size * 0.055 : 0)
         .frame(width: size, height: size)
-        .background(Color.white, in: RoundedRectangle(cornerRadius: size * 0.22))
         .accessibilityHidden(true)
     }
 }

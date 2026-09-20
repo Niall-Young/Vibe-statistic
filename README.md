@@ -55,7 +55,7 @@
 
 ### 项目结构
 
-界面与菜单栏统一使用本地打包的 [MingCute Icons](https://github.com/mingcute-design/mingcute-icons)，通过模板着色适配深浅色。Agent 品牌 Logo 与应用图标保留独立设计。新增界面图标请使用 `MingCuteSymbol` / `MingCuteIcon`，资源及 Apache-2.0 许可位于 `Sources/VibeStatistics/Resources/MingCute/`。
+界面与菜单栏统一使用本地打包的 [MingCute Icons](https://github.com/mingcute-design/mingcute-icons)，通过模板着色适配深浅色。Agent 品牌 Logo 统一使用 `Resources/AgentLogos/` 中的完整 PNG；侧栏未选中时显示灰度，选中时显示品牌彩色，悬停显示菜单背景。应用图标保留独立设计。新增界面图标请使用 `MingCuteSymbol` / `MingCuteIcon`，资源及 Apache-2.0 许可位于 `Sources/VibeStatistics/Resources/MingCute/`。
 
 - `Sources/VibeStatistics/`：AppKit 生命周期、SwiftUI 界面、SwiftData 历史和 Provider 协议。
 - `Helpers/`：Python 只读桥接、Qoder CN 官方 SDK 包装、锁定的依赖声明。
@@ -136,7 +136,7 @@ Data lives under `~/Library/Application Support/VibeStatistics/`. `usage.store` 
 
 ### Project Structure
 
-The interface and menu bar use locally bundled [MingCute Icons](https://github.com/mingcute-design/mingcute-icons), rendered as template images for light and dark appearances. Agent brand logos and the application icon keep their own designs. Use `MingCuteSymbol` / `MingCuteIcon` for new interface icons; assets and the Apache-2.0 license live in `Sources/VibeStatistics/Resources/MingCute/`.
+The interface and menu bar use locally bundled [MingCute Icons](https://github.com/mingcute-design/mingcute-icons), rendered as template images for light and dark appearances. Agent brand logos use the complete PNG assets in `Resources/AgentLogos/` throughout the app. Sidebar logos are grayscale when unselected and retain their brand colors when selected; hovering highlights the menu row. The application icon keeps its own design. Use `MingCuteSymbol` / `MingCuteIcon` for new interface icons; assets and the Apache-2.0 license live in `Sources/VibeStatistics/Resources/MingCute/`.
 
 - `Sources/VibeStatistics/`: AppKit lifecycle, SwiftUI views, SwiftData history, and the Provider protocol.
 - `Helpers/`: read-only Python bridge, official Qoder CN SDK wrapper, and pinned dependency declarations.
