@@ -55,6 +55,8 @@
 
 ### 项目结构
 
+界面与菜单栏统一使用本地打包的 [MingCute Icons](https://github.com/mingcute-design/mingcute-icons)，通过模板着色适配深浅色。Agent 品牌 Logo 与应用图标保留独立设计。新增界面图标请使用 `MingCuteSymbol` / `MingCuteIcon`，资源及 Apache-2.0 许可位于 `Sources/VibeStatistics/Resources/MingCute/`。
+
 - `Sources/VibeStatistics/`：AppKit 生命周期、SwiftUI 界面、SwiftData 历史和 Provider 协议。
 - `Helpers/`：Python 只读桥接、Qoder CN 官方 SDK 包装、锁定的依赖声明。
 - `Tests/`：解析、错误处理、进程清理、历史口径及刷新状态测试。
@@ -133,6 +135,8 @@ Settings support CLI / Node paths, adding or removing Keychain credentials, and 
 Data lives under `~/Library/Application Support/VibeStatistics/`. `usage.store` contains history; `QueryWorkspace` is an empty metadata-query workspace. On first use, Antigravity may confirm CLI workspace trust for this directory only, never for user projects. Subprocesses have timeouts and exit cleanup; the CLIs themselves may produce their usual login or runtime logs. The application does not persist conversation text, plaintext account identities, or raw response logs. Changing a DeepSeek key starts a separate history partition.
 
 ### Project Structure
+
+The interface and menu bar use locally bundled [MingCute Icons](https://github.com/mingcute-design/mingcute-icons), rendered as template images for light and dark appearances. Agent brand logos and the application icon keep their own designs. Use `MingCuteSymbol` / `MingCuteIcon` for new interface icons; assets and the Apache-2.0 license live in `Sources/VibeStatistics/Resources/MingCute/`.
 
 - `Sources/VibeStatistics/`: AppKit lifecycle, SwiftUI views, SwiftData history, and the Provider protocol.
 - `Helpers/`: read-only Python bridge, official Qoder CN SDK wrapper, and pinned dependency declarations.

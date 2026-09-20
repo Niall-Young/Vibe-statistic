@@ -51,7 +51,8 @@ import SwiftData
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         statusItem.autosaveName = "VibeStatisticsUsage"
         if let button = statusItem.button {
-            button.image = NSImage(systemSymbolName: "chart.bar.xaxis", accessibilityDescription: "Agent 用量")
+            button.image = MingCuteSymbol.chart.image.copy() as? NSImage
+            button.image?.size = NSSize(width: 18, height: 18)
             button.image?.isTemplate = true
             button.setAccessibilityLabel("Vibe Statistics · Agent 用量")
             button.action = #selector(togglePopover); button.target = self

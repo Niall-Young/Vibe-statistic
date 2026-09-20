@@ -63,9 +63,9 @@ struct StatusLabel: View {
         if store.refreshing.contains(agent) {
             HStack(spacing: 5) { ProgressView().controlSize(.mini); Text("刷新中") }.font(.caption).foregroundStyle(.secondary)
         } else if store.errors[agent] != nil {
-            Label(store.snapshots[agent] == nil ? "连接待处理" : "数据已过期", systemImage: "exclamationmark.circle").font(.caption).foregroundStyle(.orange)
+            Label { Text(store.snapshots[agent] == nil ? "连接待处理" : "数据已过期") } icon: { MingCuteIcon(.alert, size: 14) }.font(.caption).foregroundStyle(.orange)
         } else if store.snapshots[agent] != nil {
-            Label(store.stale(agent) ? "等待刷新" : "已连接", systemImage: store.stale(agent) ? "clock" : "checkmark.circle.fill")
+            Label { Text(store.stale(agent) ? "等待刷新" : "已连接") } icon: { MingCuteIcon(store.stale(agent) ? .time : .connected, size: 14) }
                 .font(.caption).foregroundStyle(store.stale(agent) ? Color.secondary : .green)
         } else { Text("等待连接").font(.caption).foregroundStyle(.secondary) }
     }
@@ -131,11 +131,11 @@ struct DetailView: View {
                     Button("刷新") { store.refresh(agent) }.disabled(store.refreshing.contains(agent))
                 }
                 if let error = store.errors[agent] {
-                    Label(error.message ?? "查询失败", systemImage: "exclamationmark.triangle")
+                    Label { Text(error.message ?? "查询失败") } icon: { MingCuteIcon(.warning, size: 16) }
                         .foregroundStyle(.orange).padding().frame(maxWidth: .infinity, alignment: .leading).background(.orange.opacity(0.07), in: RoundedRectangle(cornerRadius: 12))
                 }
                 if metrics.isEmpty {
-                    ContentUnavailableView("暂无额度数据", systemImage: "chart.bar.xaxis", description: Text(agent.loginHint))
+                    ContentUnavailableView { Label { Text("暂无额度数据") } icon: { MingCuteIcon(.chart, size: 48) } } description: { Text(agent.loginHint) }
                 } else {
                     VStack(spacing: 20) {
                         ForEach(metrics) { item in
@@ -155,7 +155,7 @@ struct DetailView: View {
                     if agent == .deepseek { Text("余额属于整个 DeepSeek 账户，可能包含其他客户端消耗、充值及赠送额度变化。当前没有足够计费证据，费用估算暂不展示。").font(.caption).fixedSize(horizontal: false, vertical: true) }
                     if metrics.contains(where: { $0.note?.contains("估算") == true }) { Text("Antigravity 重置时间根据 CLI 倒计时估算；百分比为官方面板读数。").font(.caption) }
                     HStack {
-                        Link("打开官方账户页面 ↗", destination: agent.portal)
+                        Link(destination: agent.portal) { Label { Text("打开官方账户页面") } icon: { MingCuteIcon(.externalLink, size: 14) } }
                         Button("接入设置") { store.selection = "settings" }
                     }.padding(.top, 4)
                 }.foregroundStyle(.secondary)
@@ -174,7 +174,7 @@ struct DetailView: View {
                     ForEach(metrics) { Text("\($0.title) · \($0.unit)").tag($0.id) }
                 }.labelsHidden().frame(maxWidth: 330, alignment: .leading)
                 if points.isEmpty {
-                    ContentUnavailableView("开始积累趋势", systemImage: "chart.xyaxis.line", description: Text("首次成功刷新后开始记录，不补填过去的数据。")).frame(height: 190)
+                    ContentUnavailableView { Label { Text("开始积累趋势") } icon: { MingCuteIcon(.trend, size: 48) } } description: { Text("首次成功刷新后开始记录，不补填过去的数据。") }.frame(height: 190)
                 } else {
                     Chart(points) { point in
                         PointMark(x: .value("日期", point.date), y: .value(metric.unit, point.value))
@@ -295,7 +295,7 @@ struct MenuView: View {
             HStack {
                 VStack(alignment: .leading, spacing: 3) { Text("Vibe Statistics").font(.headline); Text("\(store.connected) / 5 已连接").font(.caption).foregroundStyle(.secondary) }
                 Spacer()
-                Button { store.refresh() } label: { Image(systemName: "arrow.clockwise") }.buttonStyle(.borderless).disabled(store.active).help("刷新全部")
+                Button { store.refresh() } label: { MingCuteIcon(.refresh, size: 16) }.buttonStyle(.borderless).disabled(store.active).help("刷新全部").accessibilityLabel("刷新全部")
             }.padding(18)
             Divider()
             ScrollView {
