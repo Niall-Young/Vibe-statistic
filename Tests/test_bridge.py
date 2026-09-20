@@ -109,3 +109,33 @@ class WorkspaceIsolationTests(unittest.TestCase):
                              env=dict(os.environ, TERM='xterm'), stdout=subprocess.PIPE) as process:
                     out, _ = process.communicate(timeout=3)
                     self.assertEqual(out.decode().splitlines(), [str(work.resolve()), 'xterm'])
+
+class SandboxBoundaryTests(unittest.TestCase):
+    def test_descendants_cannot_scan_personal_folders_even_with_clean_environment(self):
+        import tempfile,json
+        with tempfile.TemporaryDirectory() as d:
+            home=pathlib.Path(d).resolve()
+            folders={'DESKTOP':'Desktop','DOCUMENTS':'Documents','DOWNLOADS':'Downloads',
+                     'PICTURES':'Pictures','MOVIES':'Movies','MUSIC':'Music','HOME_GIT':'.git'}
+            args=['/usr/bin/sandbox-exec']
+            for key,name in folders.items():
+                path=home/name;path.mkdir();(path/'fixture').write_text('test-only')
+                args += ['-D',key+'='+str(path)]
+            (home/'document-link').symlink_to(home/'Documents',target_is_directory=True)
+            allowed=home/'.codex';allowed.mkdir();(allowed/'fixture').write_text('allowed-test')
+            probe = """import os,pathlib,sys
+root=pathlib.Path(sys.argv[1])
+for name in ['Desktop','Documents','Downloads','Pictures','Movies','Music','.git','document-link']:
+    for operation in [lambda p:list(p.iterdir()),lambda p:(p/'fixture').read_text(),lambda p:(p/'new').write_text('x')]:
+        try: operation(root/name)
+        except PermissionError: pass
+        else: raise AssertionError('Sandbox failed for '+name)
+assert (root/'.codex/fixture').read_text() == 'allowed-test'
+print('boundary-ok')
+"""
+            # An env-clearing grandchild simulates CLIs discarding GIT_* settings.
+            wrapper='import subprocess,sys; subprocess.run(["/usr/bin/python3","-c",sys.argv[1],sys.argv[2]],env={},check=True)'
+            args += ['-f',str(ROOT/'Helpers/query.sb'),'/usr/bin/python3','-c',wrapper,probe,str(home)]
+            result=subprocess.run(args,capture_output=True,text=True,timeout=10)
+            self.assertEqual(result.returncode,0,result.stderr)
+            self.assertEqual(result.stdout.strip(),'boundary-ok')

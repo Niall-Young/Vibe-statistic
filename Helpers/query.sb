@@ -1,0 +1,12 @@
+(version 1)
+(allow default)
+; Applied to the Python bridge and inherited by every CLI and grandchild.
+; Quota collection never needs personal documents or the home Git repository.
+(deny file-read* file-write*
+    (subpath (param "DESKTOP"))
+    (subpath (param "DOCUMENTS"))
+    (subpath (param "DOWNLOADS"))
+    (subpath (param "PICTURES"))
+    (subpath (param "MOVIES"))
+    (subpath (param "MUSIC"))
+    (subpath (param "HOME_GIT")))

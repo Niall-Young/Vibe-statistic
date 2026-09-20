@@ -23,8 +23,18 @@ struct CLIProvider: UsageProvider {
         return await withTaskCancellationHandler {
             await Task.detached(priority: .utility) {
                 let process = Process(); let input = Pipe(); let output = Pipe()
-                process.executableURL = URL(fileURLWithPath: "/usr/bin/python3")
-                process.arguments = [helper.path]
+                process.executableURL = URL(fileURLWithPath: "/usr/bin/sandbox-exec")
+                let home = FileManager.default.homeDirectoryForCurrentUser
+                let protectedFolders = [("DESKTOP", "Desktop"), ("DOCUMENTS", "Documents"),
+                    ("DOWNLOADS", "Downloads"), ("PICTURES", "Pictures"), ("MOVIES", "Movies"),
+                    ("MUSIC", "Music"), ("HOME_GIT", ".git")]
+                var arguments: [String] = []
+                for (key, folder) in protectedFolders {
+                    arguments += ["-D", "\(key)=\(home.appendingPathComponent(folder).resolvingSymlinksInPath().path)"]
+                }
+                arguments += ["-f", helper.deletingLastPathComponent().appendingPathComponent("query.sb").path,
+                              "/usr/bin/python3", helper.path]
+                process.arguments = arguments
                 process.standardInput = input; process.standardOutput = output
                 process.standardError = FileHandle.nullDevice
                 var environment = ProcessInfo.processInfo.environment
