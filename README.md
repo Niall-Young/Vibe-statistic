@@ -13,7 +13,7 @@
 
 ### 核心能力
 
-- 首页按 Nico Figma 设计使用原生 SwiftUI 实现：浅色白底、240 点侧栏、四块摘要、16 点圆角卡片与 20 段额度条；支持按 Agent 名称搜索和用量详情跳转。摘要显示已连接 Agent、额度窗口、本机近 30 天输入与输出 Token 和 DeepSeek 余额；Token 仅覆盖 Claude Code / DeepSeek 本机日志，缺失数据不显示为零。宽窗口显示三列卡片，窄窗口自动换列。
+- 首页按 Nico Figma 设计使用原生 SwiftUI 实现：浅色白底、自定义 240 点平直侧栏与 52 点顶部栏、四块摘要、16 点圆角卡片与 20 段额度条；支持按 Agent 名称搜索和用量详情跳转。摘要显示已连接 Agent、额度窗口、本机近 30 天输入与输出 Token 和 DeepSeek 余额；Token 仅覆盖 Claude Code / DeepSeek 本机日志，缺失数据不显示为零。宽窗口显示三列卡片，窄窗口自动换列。
 - 菜单栏摘要、独立总览窗口、各 Agent 详情、7 / 30 天每日趋势、接入设置。菜单栏列出所有返回的额度窗口（包括 5 小时与每周）；菜单栏、总览和详情均显示服务提供的重置或到期时间，按本机时区显示，估算时间明确标注。
 - 五个只读适配器，保留官方单位、额度窗口、账户隔离与更新时间；缺失值不视为零。
 - 默认每 5 分钟刷新，支持 1 / 15 分钟；请求合并、失败退避、休眠暂停及唤醒刷新。
@@ -92,7 +92,7 @@ A personal SwiftUI + AppKit menu bar application for Codex, Kimi Code, Qoder CN 
 
 ### Features
 
-- The home screen implements the Nico Figma design in native SwiftUI: a white light-mode surface, 240-point sidebar, four summaries, 16-point card corners, and 20-segment quota bars. Search filters agents by name and cards open usage details. Summaries show connected agents, quota windows, local 30-day input and output tokens, and the DeepSeek balance. Tokens cover only local Claude Code / DeepSeek logs; missing data is not shown as zero. Wide windows show three card columns; narrow windows reflow automatically.
+- The home screen implements the Nico Figma design in native SwiftUI: a white light-mode surface, custom flat 240-point sidebar and 52-point header, four summaries, 16-point card corners, and 20-segment quota bars. Search filters agents by name and cards open usage details. Summaries show connected agents, quota windows, local 30-day input and output tokens, and the DeepSeek balance. Tokens cover only local Claude Code / DeepSeek logs; missing data is not shown as zero. Wide windows show three card columns; narrow windows reflow automatically.
 - Menu bar summary, overview window, provider details, 7 / 30-day daily observations, and connection settings. The menu lists every returned quota window, including five-hour and weekly limits. The menu, overview, and details show service-provided reset or expiry times in the local time zone, with estimated times explicitly labeled.
 - Five read-only adapters preserving official units, quota windows, account boundaries, and timestamps. Missing values are never treated as zero.
 - Five-minute refresh by default, with 1 / 15-minute options; request coalescing, retry backoff, sleep suspension, and wake refresh.

@@ -30,7 +30,7 @@ struct HomeIcon: View {
     private static let images: [String: NSImage] = {
         let resources = Bundle.main.resourceURL?.appendingPathComponent("VibeStatistics_VibeStatistics.bundle")
         let bundle = resources.flatMap(Bundle.init(url:)) ?? Bundle.module
-        return Dictionary(uniqueKeysWithValues: ["overview", "settings", "search", "refresh", "connected"].compactMap { name in
+        return Dictionary(uniqueKeysWithValues: ["overview", "settings", "search", "refresh", "connected", "sidebar"].compactMap { name in
             guard let url = bundle.url(forResource: name, withExtension: "svg", subdirectory: "HomeIcons"),
                   let image = NSImage(contentsOf: url) else { return nil }
             return (name, image)
@@ -45,72 +45,89 @@ struct HomeIcon: View {
     }
 }
 
+// The shell is intentionally custom: NavigationSplitView/List/Toolbar add
+// macOS 26 floating glass and system insets that are absent from the design.
 struct MainView: View {
     @ObservedObject var store: UsageStore
     @State private var search = ""
+    @State private var sidebarVisible = true
     @FocusState private var searchFocused: Bool
     private var title: String {
         if store.selection == "settings" { return "设置" }
         return store.selection.flatMap(Agent.init(rawValue:))?.name ?? "总览"
     }
     var body: some View {
-        NavigationSplitView {
-            List {
-                navigationRow("总览", selection: "overview", icon: "overview")
-                navigationRow("设置", selection: "settings", icon: "settings")
-                HStack {
-                    Text("用量详情").font(.system(size: 14)).foregroundStyle(HomeStyle.muted)
-                    Spacer()
-                    Button {
-                        store.selection = "overview"
-                        searchFocused = true
-                    } label: { HomeIcon(name: "search", size: 16) }
-                    .buttonStyle(.plain).help("搜索智能体").accessibilityLabel("搜索智能体")
-                }.padding(.horizontal, 12).padding(.top, 16).padding(.bottom, 4)
-                    .listRowInsets(EdgeInsets()).listRowSeparator(.hidden)
-                ForEach(Agent.allCases) { agent in
-                    Button { store.selection = agent.rawValue } label: {
-                        HStack(spacing: 8) {
-                            AgentLogo(agent: agent, size: 24).saturation(0)
-                                .overlay(RoundedRectangle(cornerRadius: 8).stroke(HomeStyle.border))
-                            Text(agent.name)
-                            Spacer(minLength: 0)
-                        }.modifier(SidebarRowStyle(selected: store.selection == agent.rawValue))
-                    }.buttonStyle(.plain).accessibilityAddTraits(store.selection == agent.rawValue ? .isSelected : [])
-                        .listRowInsets(EdgeInsets()).listRowSeparator(.hidden)
-                }
-            }
-            .listStyle(.plain).scrollContentBackground(.hidden)
-            .padding(.horizontal, 8).padding(.top, 4)
-            .background(HomeStyle.surface)
-            .navigationSplitViewColumnWidth(min: 200, ideal: 240, max: 260)
-        } detail: {
-            Group {
-                if store.selection == "settings" { SettingsView(store: store) }
-                else if let selection = store.selection, let agent = Agent(rawValue: selection) {
-                    DetailView(store: store, agent: agent).id(agent)
-                } else { OverviewView(store: store, search: $search, searchFocused: $searchFocused) }
-            }
-            .toolbar {
-                ToolbarItem(placement: .navigation) {
-                    HStack(spacing: 10) {
-                        Text(title).font(.system(size: 14, weight: .medium))
-                        if let date = store.snapshots.values.compactMap(\.date).max() {
-                            Text("数据更新于 \(date.formatted(date: .omitted, time: .shortened))")
-                                .font(.system(size: 12)).foregroundStyle(HomeStyle.muted)
-                        }
+        HStack(spacing: 0) {
+            if sidebarVisible {
+                VStack(spacing: 0) {
+                    windowHeader
+                    ScrollView {
+                        VStack(spacing: 0) {
+                            navigationRow("总览", selection: "overview", icon: "overview")
+                            navigationRow("设置", selection: "settings", icon: "settings")
+                            HStack {
+                                Text("用量详情").font(.system(size: 14)).foregroundStyle(HomeStyle.muted)
+                                Spacer()
+                                Button {
+                                    store.selection = "overview"
+                                    searchFocused = true
+                                } label: { HomeIcon(name: "search", size: 16) }
+                                .buttonStyle(.plain).help("搜索智能体").accessibilityLabel("搜索智能体")
+                            }.padding(.leading, 12).padding(.trailing, 5)
+                                .frame(height: 22).padding(.top, 16).padding(.bottom, 4)
+                            ForEach(Agent.allCases) { agent in
+                                Button { store.selection = agent.rawValue } label: {
+                                    HStack(spacing: 8) {
+                                        AgentLogo(agent: agent, size: 24).saturation(0)
+                                            .overlay(RoundedRectangle(cornerRadius: 8).stroke(HomeStyle.border))
+                                        Text(agent.name)
+                                        Spacer(minLength: 0)
+                                    }.modifier(SidebarRowStyle(selected: store.selection == agent.rawValue))
+                                }.buttonStyle(.plain)
+                                    .accessibilityAddTraits(store.selection == agent.rawValue ? .isSelected : [])
+                            }
+                        }.padding(.horizontal, 8)
                     }
-                }
-                ToolbarItem {
-                    Button { store.refresh() } label: { HomeIcon(name: "refresh", size: 16) }
-                        .keyboardShortcut("r").help("刷新全部额度 ⌘R")
-                        .accessibilityLabel("刷新全部额度").disabled(store.active)
-                }
+                }.frame(width: 239).frame(maxHeight: .infinity)
+                    .background(HomeStyle.surface)
+                Rectangle().fill(HomeStyle.border).frame(width: 1)
             }
+            VStack(spacing: 0) {
+                HStack(spacing: 10) {
+                    if !sidebarVisible { windowHeader.fixedSize() }
+                    Text(title).font(.system(size: 14, weight: .medium))
+                    if let date = store.snapshots.values.compactMap(\.date).max() {
+                        Text("数据更新于 \(date.formatted(date: .omitted, time: .shortened))")
+                            .font(.system(size: 12)).foregroundStyle(HomeStyle.muted)
+                    }
+                    Spacer()
+                    Button { store.refresh() } label: {
+                        HomeIcon(name: "refresh", size: 16).frame(width: 32, height: 32).contentShape(Rectangle())
+                    }.buttonStyle(.plain).keyboardShortcut("r").help("刷新全部额度 ⌘R")
+                        .accessibilityLabel("刷新全部额度").disabled(store.active)
+                }.padding(.horizontal, 20).frame(height: 52)
+                    .background(WindowDragArea())
+                Group {
+                    if store.selection == "settings" { SettingsView(store: store) }
+                    else if let selection = store.selection, let agent = Agent(rawValue: selection) {
+                        DetailView(store: store, agent: agent).id(agent)
+                    } else { OverviewView(store: store, search: $search, searchFocused: $searchFocused) }
+                }.frame(maxWidth: .infinity, maxHeight: .infinity)
+            }.frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .navigationTitle("")
-        .background(HomeStyle.surface)
-        .frame(minWidth: 820, minHeight: 620)
+        .foregroundStyle(HomeStyle.text).background(HomeStyle.surface)
+        .frame(minWidth: 820, minHeight: 620).ignoresSafeArea()
+    }
+    private var windowHeader: some View {
+        HStack(spacing: 20) {
+            WindowControls()
+            Button { sidebarVisible.toggle() } label: {
+                HomeIcon(name: "sidebar", size: 16).frame(width: 32, height: 32).contentShape(Rectangle())
+            }.buttonStyle(.plain).help(sidebarVisible ? "隐藏边栏" : "显示边栏")
+                .accessibilityLabel(sidebarVisible ? "隐藏边栏" : "显示边栏")
+            Spacer(minLength: 0)
+        }.padding(.leading, 20).padding(.trailing, 13).frame(height: 52)
+            .background(WindowDragArea())
     }
     private func navigationRow(_ title: String, selection: String, icon: String) -> some View {
         Button { store.selection = selection } label: {
@@ -121,8 +138,40 @@ struct MainView: View {
             }.modifier(SidebarRowStyle(selected: (store.selection ?? "overview") == selection))
         }.buttonStyle(.plain)
             .accessibilityAddTraits((store.selection ?? "overview") == selection ? .isSelected : [])
-            .listRowInsets(EdgeInsets()).listRowSeparator(.hidden)
     }
+}
+
+private struct WindowControls: View {
+    @State private var hovering = false
+    var body: some View {
+        HStack(spacing: 8) {
+            control("关闭窗口", color: Color(red: 1, green: 0.37, blue: 0.34), symbol: "xmark") { $0.performClose(nil) }
+            control("最小化窗口", color: Color(red: 1, green: 0.74, blue: 0.18), symbol: "minus") { $0.miniaturize(nil) }
+            control("缩放窗口", color: Color(red: 0.16, green: 0.79, blue: 0.25), symbol: "plus") { $0.zoom(nil) }
+        }.onHover { hovering = $0 }
+    }
+    private func control(_ title: String, color: Color, symbol: String, action: @escaping (NSWindow) -> Void) -> some View {
+        Button {
+            if let window = (NSApp.delegate as? AppDelegate)?.window { action(window) }
+        } label: {
+            Circle().fill(color).frame(width: 12, height: 12)
+                .overlay {
+                    if hovering { Image(systemName: symbol).font(.system(size: 8, weight: .bold)).foregroundStyle(.black.opacity(0.65)) }
+                }.contentShape(Circle())
+        }.buttonStyle(.plain).accessibilityLabel(title).help(title)
+    }
+}
+
+private struct WindowDragArea: NSViewRepresentable {
+    final class DragView: NSView {
+        override var mouseDownCanMoveWindow: Bool { true }
+        override func mouseDown(with event: NSEvent) {
+            if event.clickCount == 2 { window?.zoom(nil) }
+            else { window?.performDrag(with: event) }
+        }
+    }
+    func makeNSView(context: Context) -> DragView { DragView() }
+    func updateNSView(_ nsView: DragView, context: Context) {}
 }
 
 private struct SidebarRowStyle: ViewModifier {
@@ -279,7 +328,7 @@ struct OverviewView: View {
                     if agents.isEmpty {
                         ContentUnavailableView.search(text: search).frame(maxWidth: .infinity)
                     } else {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 330), spacing: 12)], alignment: .leading, spacing: 12) {
+                        LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 12), count: min(3, max(1, Int((geometry.size.width - 28) / 342)))), alignment: .leading, spacing: 12) {
                             ForEach(agents) { agent in AgentCard(store: store, agent: agent) }
                         }
                     }
