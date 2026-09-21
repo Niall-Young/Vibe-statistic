@@ -113,12 +113,30 @@ struct MetricRow: View {
     }
 }
 
+struct ChartTooltip: View {
+    let title: String
+    let value: String
+    var body: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(title).nicoTypography("12/Regular/Default").foregroundStyle(Nico.color(.colorTextSubtle))
+            Text(value).nicoTypography("14/Bold/Default").monospacedDigit()
+        }
+        .padding(.horizontal, 10).padding(.vertical, 6)
+        .background(Nico.color(.colorSurfaceRaised), in: RoundedRectangle(cornerRadius: 8))
+        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Nico.color(.colorBorder), lineWidth: 1))
+        .shadow(color: .black.opacity(0.08), radius: 6, y: 2)
+        .fixedSize()
+    }
+}
+
 struct DetailView: View {
     @ObservedObject var store: UsageStore
     let agent: Agent
     @State private var days = 7
     @State private var selectedMetric = ""
+    @State private var hoverDate: Date?
     var snapshot: UsageSnapshot? { store.snapshots[agent] }
+    var hoveredDay: Date? { hoverDate.map { Calendar.current.startOfDay(for: $0) } }
     var metrics: [UsageMetric] { snapshot?.metrics ?? [] }
     // Consumption only applies to quota windows and credit buckets; balances are excluded
     // because a balance change is not necessarily consumption.
@@ -193,13 +211,39 @@ struct DetailView: View {
                     Chart(consumedPoints) { point in
                         BarMark(x: .value("日期", point.date, unit: .day), y: .value(unitLabel, point.value), width: .ratio(0.55))
                             .foregroundStyle(Nico.color(.colorBackgroundBrandIntense)).cornerRadius(4)
+                            .opacity(hoveredDay == nil || hoveredDay == point.date ? 1 : 0.55)
                             .accessibilityLabel(point.actualDate.formatted(date: .abbreviated, time: .shortened))
                             .accessibilityValue("\(point.value) \(unitLabel)")
+                        if hoveredDay == point.date {
+                            RuleMark(x: .value("日期", point.date, unit: .day))
+                                .lineStyle(StrokeStyle(lineWidth: 1, dash: [4]))
+                                .foregroundStyle(Nico.color(.colorBorderIntense))
+                                .annotation(position: .top, overflowResolution: .init(x: .fit(to: .chart), y: .disabled)) {
+                                    ChartTooltip(title: point.date.formatted(.dateTime.month().day()),
+                                        value: "\(point.value.formatted(.number.precision(.fractionLength(0...2)))) \(unitLabel)")
+                                }
+                        }
                     }
                     .chartXScale(domain: Calendar.current.startOfDay(for: Date().addingTimeInterval(-Double(days - 1) * 86400))...Calendar.current.startOfDay(for: Date()).addingTimeInterval(86400))
                     .chartYScale(domain: 0...max((consumedPoints.map(\.value).max() ?? 1) * 1.15, 1))
                     .chartXAxis { AxisMarks(values: .stride(by: .day, count: days == 7 ? 1 : 5)) { _ in AxisGridLine(); AxisValueLabel(format: .dateTime.month().day()) } }
                     .frame(height: 205)
+                    .chartOverlay { proxy in
+                        GeometryReader { geo in
+                            Rectangle().fill(.clear).contentShape(Rectangle())
+                                .onContinuousHover { phase in
+                                    switch phase {
+                                    case .active(let location):
+                                        if let plotFrame = proxy.plotFrame {
+                                            let x = location.x - geo[plotFrame].origin.x
+                                            hoverDate = proxy.value(atX: x, as: Date.self)
+                                        }
+                                    case .ended:
+                                        hoverDate = nil
+                                    }
+                                }
+                        }
+                    }
                 }
             }
         }.padding(24).nicoCard()
