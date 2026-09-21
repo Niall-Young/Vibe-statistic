@@ -13,6 +13,7 @@ Vendored from the official main archive on 2026-09-20 (package version 3.0.2). S
 | connected.svg | filled/system/check_circle.svg |
 | sidebar.svg | regular/design/layout_left.svg |
 | close.svg | regular/system/close.svg |
+| power.svg | regular/system/power.svg |
 | minimize.svg | regular/system/minimize.svg |
 | add.svg | regular/system/add.svg |
 | clear.svg | filled/system/close_circle.svg |

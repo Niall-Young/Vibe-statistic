@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <title>Vibe Statistics — quiet little creature</title>
+  <!-- White macOS tile; transparent outside. -->
+  <path fill="#ffffff" d="M280 72H744C878 72 952 146 952 280V744C952 878 878 952 744 952H280C146 952 72 878 72 744V280C72 146 146 72 280 72Z"/>
+  <!-- One abstract, gently asymmetric mass. No mechanical appendages. -->
+  <path fill="#000000" d="M396 286C424 260 461 248 510 248H583C686 248 750 312 750 413V554C750 650 709 705 634 722C596 731 575 754 534 754C492 754 473 727 436 727H414C326 727 274 672 274 583V465C274 416 293 384 329 365C364 347 370 310 396 286Z"/>
+  <!-- Two small apertures suggest awareness without a literal face. -->
+  <path fill="#ffffff" d="M407 440C423 440 432 452 432 469V512C432 529 423 541 407 541C391 541 382 529 382 512V469C382 452 391 440 407 440Z"/>
+  <path fill="#ffffff" d="M597 421C613 421 622 433 622 450V493C622 510 613 522 597 522C581 522 572 510 572 493V450C572 433 581 421 597 421Z"/>
+</svg>

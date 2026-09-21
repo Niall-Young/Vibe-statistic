@@ -4,7 +4,7 @@ import SwiftUI
 /// Original MingCute artwork and its license are bundled with the app.
 enum MingCuteSymbol: String, CaseIterable {
     case overview, settings, search, refresh, connected, sidebar
-    case close, minimize, add, clear, warning, alert, time, chart, trend, externalLink
+    case close, power, minimize, add, clear, warning, alert, time, chart, trend, externalLink
 
     private static let images: [Self: NSImage] = {
         let resources = Bundle.main.resourceURL?.appendingPathComponent("VibeStatistics_VibeStatistics.bundle")

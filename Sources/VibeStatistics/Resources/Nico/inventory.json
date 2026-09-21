@@ -1,0 +1,3208 @@
+[
+  {
+    "page": "Button",
+    "id": "13:177",
+    "sets": [
+      {
+        "id": "13:7821",
+        "name": "Button",
+        "count": 1440,
+        "properties": {
+          "✏️label#13:0": {
+            "type": "TEXT",
+            "defaultValue": "Button"
+          },
+          "↪️slot left icon#13:321": {
+            "type": "INSTANCE_SWAP",
+            "defaultValue": "13:2",
+            "preferredValues": [
+              {
+                "type": "COMPONENT",
+                "key": "96b27367f1fb00ac7e988b3cfc31d5060aba75e7"
+              }
+            ]
+          },
+          "↪️slot right icon#13:642": {
+            "type": "INSTANCE_SWAP",
+            "defaultValue": "13:12",
+            "preferredValues": [
+              {
+                "type": "COMPONENT",
+                "key": "b3f7bf82822f6ffac793d884e2d0253e6f2f92f8"
+              }
+            ]
+          },
+          "color": {
+            "type": "VARIANT",
+            "defaultValue": "brand",
+            "variantOptions": [
+              "brand",
+              "negative",
+              "white"
+            ]
+          },
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "md",
+            "variantOptions": [
+              "md",
+              "sm",
+              "lg"
+            ]
+          },
+          "kind": {
+            "type": "VARIANT",
+            "defaultValue": "filled",
+            "variantOptions": [
+              "filled",
+              "tonal",
+              "ghost",
+              "plain"
+            ]
+          },
+          "capsule": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "selected": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "loading": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "left icon": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "right icon": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "13:7799"
+      },
+      {
+        "id": "30:2610",
+        "name": "Icon button",
+        "count": 360,
+        "properties": {
+          "↪️slot icon#13:321": {
+            "type": "INSTANCE_SWAP",
+            "defaultValue": "30:7363",
+            "preferredValues": [
+              {
+                "type": "COMPONENT",
+                "key": "96b27367f1fb00ac7e988b3cfc31d5060aba75e7"
+              }
+            ]
+          },
+          "color": {
+            "type": "VARIANT",
+            "defaultValue": "brand",
+            "variantOptions": [
+              "brand",
+              "negative",
+              "white"
+            ]
+          },
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "md",
+            "variantOptions": [
+              "md",
+              "sm",
+              "lg"
+            ]
+          },
+          "kind": {
+            "type": "VARIANT",
+            "defaultValue": "filled",
+            "variantOptions": [
+              "filled",
+              "tonal",
+              "ghost",
+              "plain"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "selected": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "loading": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "capsule": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "30:2613"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "13:7821",
+        "name": "Button",
+        "type": "COMPONENT_SET"
+      },
+      {
+        "id": "30:2610",
+        "name": "Icon button",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "DIvider",
+    "id": "31:6813",
+    "sets": [
+      {
+        "id": "31:6877",
+        "name": "Divider",
+        "count": 2,
+        "properties": {
+          "position": {
+            "type": "VARIANT",
+            "defaultValue": "horizontal",
+            "variantOptions": [
+              "horizontal",
+              "vertical"
+            ]
+          }
+        },
+        "sample": "31:6876"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "31:6877",
+        "name": "Divider",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Link",
+    "id": "31:6811",
+    "sets": [
+      {
+        "id": "31:7129",
+        "name": "Link",
+        "count": 30,
+        "properties": {
+          "✏️label#31:37": {
+            "type": "TEXT",
+            "defaultValue": "Link"
+          },
+          "left icon#31:56": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "↪️slot left icon#31:75": {
+            "type": "INSTANCE_SWAP",
+            "defaultValue": "31:7",
+            "preferredValues": [
+              {
+                "type": "COMPONENT",
+                "key": "f5fc6b42e74e5a764ebe3d0109efea93a71a8641"
+              }
+            ]
+          },
+          "right icon#31:94": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "↪️slot right icon#31:113": {
+            "type": "INSTANCE_SWAP",
+            "defaultValue": "31:6715",
+            "preferredValues": [
+              {
+                "type": "COMPONENT",
+                "key": "3638fef4645d1cc9460d5f2b9d9b613aedd8a746"
+              }
+            ]
+          },
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "md",
+            "variantOptions": [
+              "md",
+              "lg",
+              "sm"
+            ]
+          },
+          "color": {
+            "type": "VARIANT",
+            "defaultValue": "neutral",
+            "variantOptions": [
+              "neutral",
+              "link",
+              "negative",
+              "brand",
+              "white"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "31:7128"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "31:7129",
+        "name": "Link",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Overlay",
+    "id": "31:6843",
+    "sets": [],
+    "single": [
+      {
+        "id": "31:7131",
+        "name": "Overlay"
+      }
+    ],
+    "children": [
+      {
+        "id": "31:7131",
+        "name": "Overlay",
+        "type": "COMPONENT"
+      }
+    ]
+  },
+  {
+    "page": "Accordion",
+    "id": "31:6617",
+    "sets": [
+      {
+        "id": "31:6737",
+        "name": "Accordion item",
+        "count": 4,
+        "properties": {
+          "✏️label#31:16": {
+            "type": "TEXT",
+            "defaultValue": "This is an accordion heading"
+          },
+          "icon#31:21": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "↪️slot icon#31:26": {
+            "type": "INSTANCE_SWAP",
+            "defaultValue": "31:7",
+            "preferredValues": [
+              {
+                "type": "COMPONENT",
+                "key": "f5fc6b42e74e5a764ebe3d0109efea93a71a8641"
+              }
+            ]
+          },
+          "↪️slot content#31:31": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "expand trigger": {
+            "type": "VARIANT",
+            "defaultValue": "right",
+            "variantOptions": [
+              "right",
+              "left"
+            ]
+          },
+          "expand": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          }
+        },
+        "sample": "31:6733"
+      }
+    ],
+    "single": [
+      {
+        "id": "31:6809",
+        "name": "Accordion"
+      }
+    ],
+    "children": [
+      {
+        "id": "31:6737",
+        "name": "Accordion item",
+        "type": "COMPONENT_SET"
+      },
+      {
+        "id": "31:6809",
+        "name": "Accordion",
+        "type": "COMPONENT"
+      }
+    ]
+  },
+  {
+    "page": "Avatar",
+    "id": "31:6816",
+    "sets": [
+      {
+        "id": "31:7222",
+        "name": "Avatar",
+        "count": 10,
+        "properties": {
+          "Property 1": {
+            "type": "VARIANT",
+            "defaultValue": "lg",
+            "variantOptions": [
+              "lg",
+              "md",
+              "sm",
+              "xs",
+              "2xs"
+            ]
+          },
+          "Property 2": {
+            "type": "VARIANT",
+            "defaultValue": "square",
+            "variantOptions": [
+              "square",
+              "circle"
+            ]
+          }
+        },
+        "sample": "31:7221"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "31:7222",
+        "name": "Avatar",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Carousel",
+    "id": "31:6817",
+    "sets": [],
+    "single": [],
+    "children": []
+  },
+  {
+    "page": "Empty status",
+    "id": "31:6825",
+    "sets": [],
+    "single": [],
+    "children": []
+  },
+  {
+    "page": "Image view",
+    "id": "31:6823",
+    "sets": [],
+    "single": [],
+    "children": []
+  },
+  {
+    "page": "Progress",
+    "id": "31:6820",
+    "sets": [
+      {
+        "id": "31:7252",
+        "name": "Progress",
+        "count": 9,
+        "properties": {
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "sm",
+            "variantOptions": [
+              "md",
+              "sm",
+              "lg"
+            ]
+          },
+          "complete": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "negative": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "31:7251"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "31:7252",
+        "name": "Progress",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Table",
+    "id": "31:6819",
+    "sets": [],
+    "single": [],
+    "children": []
+  },
+  {
+    "page": "Tag",
+    "id": "31:6818",
+    "sets": [
+      {
+        "id": "31:7793",
+        "name": "Tag",
+        "count": 108,
+        "properties": {
+          "✏️label#31:132": {
+            "type": "TEXT",
+            "defaultValue": "This is tag"
+          },
+          "left icon#31:169": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "↪️slot left icon#31:206": {
+            "type": "INSTANCE_SWAP",
+            "defaultValue": "31:7",
+            "preferredValues": [
+              {
+                "type": "COMPONENT",
+                "key": "f5fc6b42e74e5a764ebe3d0109efea93a71a8641"
+              }
+            ]
+          },
+          "right icon#31:243": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "↪️slot right icon#31:280": {
+            "type": "INSTANCE_SWAP",
+            "defaultValue": "30:7363",
+            "preferredValues": [
+              {
+                "type": "COMPONENT",
+                "key": "37c93e102cade6d48957889eff3b5461bf89cb2f"
+              }
+            ]
+          },
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "lg",
+            "variantOptions": [
+              "lg",
+              "md",
+              "sm"
+            ]
+          },
+          "color": {
+            "type": "VARIANT",
+            "defaultValue": "red",
+            "variantOptions": [
+              "red",
+              "orange",
+              "yellow",
+              "lime",
+              "green",
+              "teal",
+              "sky",
+              "blue",
+              "purple",
+              "pink",
+              "grey",
+              "white"
+            ]
+          },
+          "border": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "background": {
+            "type": "VARIANT",
+            "defaultValue": "true",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          }
+        },
+        "sample": "31:7789"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "31:7793",
+        "name": "Tag",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Timeline",
+    "id": "31:6869",
+    "sets": [],
+    "single": [],
+    "children": []
+  },
+  {
+    "page": "Tooltip",
+    "id": "31:6858",
+    "sets": [],
+    "single": [
+      {
+        "id": "31:8228",
+        "name": "Tooptip"
+      }
+    ],
+    "children": [
+      {
+        "id": "31:8228",
+        "name": "Tooptip",
+        "type": "COMPONENT"
+      }
+    ]
+  },
+  {
+    "page": "Spinner",
+    "id": "1:474",
+    "sets": [
+      {
+        "id": "13:155",
+        "name": "Spinner",
+        "count": 4,
+        "properties": {
+          "pin": {
+            "type": "VARIANT",
+            "defaultValue": "1",
+            "variantOptions": [
+              "1",
+              "2",
+              "3",
+              "4"
+            ]
+          }
+        },
+        "sample": "13:156"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "13:155",
+        "name": "Spinner",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Anchor",
+    "id": "31:6832",
+    "sets": [
+      {
+        "id": "39:22325",
+        "name": "Acnhor",
+        "count": 3,
+        "properties": {
+          "↪️slot label#40:391": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "selected": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "39:22323"
+      }
+    ],
+    "single": [
+      {
+        "id": "40:22390",
+        "name": "Anchor list"
+      }
+    ],
+    "children": [
+      {
+        "id": "39:22325",
+        "name": "Acnhor",
+        "type": "COMPONENT_SET"
+      },
+      {
+        "id": "40:22390",
+        "name": "Anchor list",
+        "type": "COMPONENT"
+      }
+    ]
+  },
+  {
+    "page": "Breadcrumb",
+    "id": "30:23229",
+    "sets": [
+      {
+        "id": "31:60",
+        "name": "Breadcrumb item",
+        "count": 4,
+        "properties": {
+          "✏️label#31:0": {
+            "type": "TEXT",
+            "defaultValue": "Workspace"
+          },
+          "icon#31:5": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "↪️slot icon#31:10": {
+            "type": "INSTANCE_SWAP",
+            "defaultValue": "31:7",
+            "preferredValues": [
+              {
+                "type": "COMPONENT",
+                "key": "f5fc6b42e74e5a764ebe3d0109efea93a71a8641"
+              }
+            ]
+          },
+          "selected": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "folded": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "31:59"
+      }
+    ],
+    "single": [
+      {
+        "id": "31:81",
+        "name": "Breadcrumb"
+      }
+    ],
+    "children": [
+      {
+        "id": "31:60",
+        "name": "Breadcrumb item",
+        "type": "COMPONENT_SET"
+      },
+      {
+        "id": "31:81",
+        "name": "Breadcrumb",
+        "type": "COMPONENT"
+      }
+    ]
+  },
+  {
+    "page": "Dropdown",
+    "id": "31:6830",
+    "sets": [
+      {
+        "id": "33:10448",
+        "name": "Menu item",
+        "count": 18,
+        "properties": {
+          "↪️slot label#33:191": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "md",
+            "variantOptions": [
+              "md",
+              "sm",
+              "lg"
+            ]
+          },
+          "selected": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "33:10447"
+      },
+      {
+        "id": "33:10495",
+        "name": "Menu section title",
+        "count": 3,
+        "properties": {
+          "✏️title#33:211": {
+            "type": "TEXT",
+            "defaultValue": "Section group"
+          },
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "md",
+            "variantOptions": [
+              "md",
+              "sm",
+              "lg"
+            ]
+          }
+        },
+        "sample": "33:10492"
+      }
+    ],
+    "single": [
+      {
+        "id": "33:10503",
+        "name": "Menu"
+      }
+    ],
+    "children": [
+      {
+        "id": "33:10448",
+        "name": "Menu item",
+        "type": "COMPONENT_SET"
+      },
+      {
+        "id": "33:10503",
+        "name": "Menu",
+        "type": "COMPONENT"
+      },
+      {
+        "id": "33:10495",
+        "name": "Menu section title",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Menu",
+    "id": "31:6829",
+    "sets": [],
+    "single": [],
+    "children": []
+  },
+  {
+    "page": "Segmented",
+    "id": "31:6839",
+    "sets": [
+      {
+        "id": "32:10030",
+        "name": "Segmented item",
+        "count": 45,
+        "properties": {
+          "✏️label#32:98": {
+            "type": "TEXT",
+            "defaultValue": "Option"
+          },
+          "↪️slot icon#32:144": {
+            "type": "INSTANCE_SWAP",
+            "defaultValue": "32:9814",
+            "preferredValues": [
+              {
+                "type": "COMPONENT",
+                "key": "98836ce4174c0df82bb969c0a5c55d19088a87f8"
+              }
+            ]
+          },
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "md",
+            "variantOptions": [
+              "md",
+              "sm",
+              "lg"
+            ]
+          },
+          "selected": {
+            "type": "VARIANT",
+            "defaultValue": "true",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          },
+          "label": {
+            "type": "VARIANT",
+            "defaultValue": "true",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          },
+          "icon": {
+            "type": "VARIANT",
+            "defaultValue": "true",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "32:10029"
+      }
+    ],
+    "single": [
+      {
+        "id": "32:10233",
+        "name": "Segmented"
+      }
+    ],
+    "children": [
+      {
+        "id": "32:10030",
+        "name": "Segmented item",
+        "type": "COMPONENT_SET"
+      },
+      {
+        "id": "32:10233",
+        "name": "Segmented",
+        "type": "COMPONENT"
+      }
+    ]
+  },
+  {
+    "page": "Steps",
+    "id": "31:6868",
+    "sets": [],
+    "single": [],
+    "children": []
+  },
+  {
+    "page": "Tabs",
+    "id": "31:6838",
+    "sets": [
+      {
+        "id": "40:22474",
+        "name": "Tab",
+        "count": 12,
+        "properties": {
+          "↪️slot label#40:395": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "md",
+            "variantOptions": [
+              "md",
+              "sm",
+              "lg"
+            ]
+          },
+          "selected": {
+            "type": "VARIANT",
+            "defaultValue": "true",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "40:22473"
+      },
+      {
+        "id": "40:22523",
+        "name": "Tabs",
+        "count": 2,
+        "properties": {
+          "↪️amount controller#40:408": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "divider": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "40:22522"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "40:22474",
+        "name": "Tab",
+        "type": "COMPONENT_SET"
+      },
+      {
+        "id": "40:22523",
+        "name": "Tabs",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Checkbox",
+    "id": "31:6840",
+    "sets": [
+      {
+        "id": "32:11",
+        "name": "Chckbox",
+        "count": 18,
+        "properties": {
+          "↪️slot label#32:0": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "selected": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "indeterminate": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "label": {
+            "type": "VARIANT",
+            "defaultValue": "true",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          }
+        },
+        "sample": "32:10"
+      },
+      {
+        "id": "32:6720",
+        "name": "Checkbox group",
+        "count": 2,
+        "properties": {
+          "↪️amount controller#32:20": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": true
+            },
+            "preferredValues": [
+              {
+                "type": "COMPONENT_SET",
+                "key": "d738390afa3f2c0bcddd64bd781aa66fb8345cc4"
+              }
+            ]
+          },
+          "layout": {
+            "type": "VARIANT",
+            "defaultValue": "horizontal",
+            "variantOptions": [
+              "horizontal",
+              "vertical"
+            ]
+          }
+        },
+        "sample": "32:6719"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "32:11",
+        "name": "Chckbox",
+        "type": "COMPONENT_SET"
+      },
+      {
+        "id": "32:6720",
+        "name": "Checkbox group",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Chip",
+    "id": "31:6849",
+    "sets": [
+      {
+        "id": "32:7390",
+        "name": "Chip",
+        "count": 30,
+        "properties": {
+          "✏️label#32:38": {
+            "type": "TEXT",
+            "defaultValue": "This is a chip"
+          },
+          "icon#32:57": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "↪️slot icon#32:76": {
+            "type": "INSTANCE_SWAP",
+            "defaultValue": "31:7",
+            "preferredValues": [
+              {
+                "type": "COMPONENT",
+                "key": "f5fc6b42e74e5a764ebe3d0109efea93a71a8641"
+              }
+            ]
+          },
+          "selected": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "sm",
+            "variantOptions": [
+              "sm",
+              "md",
+              "lg"
+            ]
+          },
+          "border": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "32:7389"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "32:7390",
+        "name": "Chip",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Date picker",
+    "id": "31:6857",
+    "sets": [],
+    "single": [],
+    "children": []
+  },
+  {
+    "page": "Dialog",
+    "id": "31:6842",
+    "sets": [
+      {
+        "id": "32:7037",
+        "name": "Dialog",
+        "count": 2,
+        "properties": {
+          "✏️heading#32:23": {
+            "type": "TEXT",
+            "defaultValue": "Dialog heading"
+          },
+          "✏️description#32:26": {
+            "type": "TEXT",
+            "defaultValue": "Description goes here...Description goes here...Description goes here...Description goes here..."
+          },
+          "addition item#32:29": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "↪️slot addition item#32:32": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "↪️slot actions#32:35": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "negative": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "32:7036"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "32:7037",
+        "name": "Dialog",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Form",
+    "id": "31:6844",
+    "sets": [],
+    "single": [],
+    "children": []
+  },
+  {
+    "page": "Input",
+    "id": "31:6833",
+    "sets": [
+      {
+        "id": "37:11151",
+        "name": "Input",
+        "count": 42,
+        "properties": {
+          "✏️placeholder#37:212": {
+            "type": "TEXT",
+            "defaultValue": "Input something..."
+          },
+          "↪️slot prefix#37:237": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "↪️slot suffix#37:262": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "prefix#37:312": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "suffix#37:337": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "md",
+            "variantOptions": [
+              "md",
+              "lg",
+              "sm"
+            ]
+          },
+          "filled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "focused": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "read only": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "clear all": {
+            "type": "VARIANT",
+            "defaultValue": "true",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          },
+          "negative": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "37:11135"
+      },
+      {
+        "id": "39:15741",
+        "name": "Input area",
+        "count": 10,
+        "properties": {
+          "✏️placeholder#37:212": {
+            "type": "TEXT",
+            "defaultValue": "Input something..."
+          },
+          "filled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "focused": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "read only": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "negative": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "39:15742"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "37:11151",
+        "name": "Input",
+        "type": "COMPONENT_SET"
+      },
+      {
+        "id": "39:15741",
+        "name": "Input area",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Number input",
+    "id": "31:6835",
+    "sets": [
+      {
+        "id": "37:11503",
+        "name": "Number input",
+        "count": 42,
+        "properties": {
+          "✏️placeholder#37:212": {
+            "type": "TEXT",
+            "defaultValue": "Input something..."
+          },
+          "↪️slot prefix#37:237": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "↪️slot suffix#37:262": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "prefix#37:312": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "suffix#37:337": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "md",
+            "variantOptions": [
+              "md",
+              "lg",
+              "sm"
+            ]
+          },
+          "filled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "focused": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "read only": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "clear all": {
+            "type": "VARIANT",
+            "defaultValue": "true",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          },
+          "nagative": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "37:11504"
+      },
+      {
+        "id": "37:11942",
+        "name": "Stepper trigger",
+        "count": 3,
+        "properties": {
+          "↪️slot icon#37:387": {
+            "type": "INSTANCE_SWAP",
+            "defaultValue": "37:11898",
+            "preferredValues": [
+              {
+                "type": "COMPONENT",
+                "key": "c7fe289157e827cd127931757901db3bc38a66b2"
+              },
+              {
+                "type": "COMPONENT",
+                "key": "d14e4f02c1322183181e0863dd6ba68569e9fd1a"
+              }
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "37:11941"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "37:11503",
+        "name": "Number input",
+        "type": "COMPONENT_SET"
+      },
+      {
+        "id": "37:11942",
+        "name": "Stepper trigger",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Radio",
+    "id": "31:6841",
+    "sets": [
+      {
+        "id": "32:6789",
+        "name": "Radio",
+        "count": 12,
+        "properties": {
+          "↪️slot label#32:0": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "selected": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "indeterminate": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "label": {
+            "type": "VARIANT",
+            "defaultValue": "true",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          }
+        },
+        "sample": "32:6790"
+      },
+      {
+        "id": "32:6874",
+        "name": "Radio group",
+        "count": 2,
+        "properties": {
+          "↪️amount controller#32:20": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": true
+            },
+            "preferredValues": [
+              {
+                "type": "COMPONENT_SET",
+                "key": "d738390afa3f2c0bcddd64bd781aa66fb8345cc4"
+              }
+            ]
+          },
+          "layout": {
+            "type": "VARIANT",
+            "defaultValue": "horizontal",
+            "variantOptions": [
+              "horizontal",
+              "vertical"
+            ]
+          }
+        },
+        "sample": "32:6875"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "32:6789",
+        "name": "Radio",
+        "type": "COMPONENT_SET"
+      },
+      {
+        "id": "32:6874",
+        "name": "Radio group",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Range",
+    "id": "32:7213",
+    "sets": [
+      {
+        "id": "32:7214",
+        "name": "Range",
+        "count": 6,
+        "properties": {
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "sm",
+            "variantOptions": [
+              "md",
+              "sm",
+              "lg"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "32:7215"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "32:7214",
+        "name": "Range",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Password input",
+    "id": "31:6836",
+    "sets": [
+      {
+        "id": "39:15114",
+        "name": "Password input",
+        "count": 48,
+        "properties": {
+          "✏️placeholder#37:212": {
+            "type": "TEXT",
+            "defaultValue": "Select something..."
+          },
+          "↪️slot prefix#37:237": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "prefix#37:312": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "visible": {
+            "type": "VARIANT",
+            "defaultValue": "true",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          },
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "md",
+            "variantOptions": [
+              "md",
+              "lg",
+              "sm"
+            ]
+          },
+          "filled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "focused": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "negative": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "39:15115"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "39:15114",
+        "name": "Password input",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Search box",
+    "id": "31:6834",
+    "sets": [
+      {
+        "id": "39:13911",
+        "name": "Search box",
+        "count": 18,
+        "properties": {
+          "✏️placeholder#37:212": {
+            "type": "TEXT",
+            "defaultValue": "Select something..."
+          },
+          "↪️slot prefix#37:237": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "prefix#37:312": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "md",
+            "variantOptions": [
+              "md",
+              "lg",
+              "sm"
+            ]
+          },
+          "filled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "focused": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "39:13912"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "39:13911",
+        "name": "Search box",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Select",
+    "id": "31:6845",
+    "sets": [
+      {
+        "id": "39:18647",
+        "name": "Select",
+        "count": 42,
+        "properties": {
+          "✏️placeholder#37:212": {
+            "type": "TEXT",
+            "defaultValue": "Select something..."
+          },
+          "↪️slot prefix#37:237": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "↪️slot suffix#37:262": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "prefix#37:312": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "suffix#37:337": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "md",
+            "variantOptions": [
+              "md",
+              "lg",
+              "sm"
+            ]
+          },
+          "filled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "focused": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "read only": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "clear all": {
+            "type": "VARIANT",
+            "defaultValue": "true",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          },
+          "negative": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "39:18648"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "39:18647",
+        "name": "Select",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Slider",
+    "id": "31:6855",
+    "sets": [
+      {
+        "id": "32:7038",
+        "name": "Slider",
+        "count": 6,
+        "properties": {
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "sm",
+            "variantOptions": [
+              "md",
+              "sm",
+              "lg"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "32:7039"
+      },
+      {
+        "id": "32:7158",
+        "name": "Handle",
+        "count": 6,
+        "properties": {
+          "tooltip#63:411": {
+            "type": "BOOLEAN",
+            "defaultValue": true
+          },
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "sm",
+            "variantOptions": [
+              "sm",
+              "md",
+              "lg"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "32:7153"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "32:7038",
+        "name": "Slider",
+        "type": "COMPONENT_SET"
+      },
+      {
+        "id": "32:7158",
+        "name": "Handle",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Switch",
+    "id": "31:6579",
+    "sets": [
+      {
+        "id": "31:6616",
+        "name": "Switch",
+        "count": 12,
+        "properties": {
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "sm",
+            "variantOptions": [
+              "md",
+              "lg",
+              "sm"
+            ]
+          },
+          "switch": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "31:6606"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "31:6616",
+        "name": "Switch",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Tag input",
+    "id": "31:6846",
+    "sets": [
+      {
+        "id": "39:20918",
+        "name": "Tag input",
+        "count": 42,
+        "properties": {
+          "✏️placeholder#37:212": {
+            "type": "TEXT",
+            "defaultValue": "Select something..."
+          },
+          "↪️slot prefix#37:237": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "↪️slot suffix#37:262": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "prefix#37:312": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "suffix#37:337": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "md",
+            "variantOptions": [
+              "md",
+              "lg",
+              "sm"
+            ]
+          },
+          "filled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "focused": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "read only": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "clear all": {
+            "type": "VARIANT",
+            "defaultValue": "true",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          },
+          "negative": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "39:20919"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "39:20918",
+        "name": "Tag input",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Tag select",
+    "id": "31:6847",
+    "sets": [
+      {
+        "id": "39:19398",
+        "name": "Tag select",
+        "count": 42,
+        "properties": {
+          "✏️placeholder#37:212": {
+            "type": "TEXT",
+            "defaultValue": "Select something..."
+          },
+          "↪️slot prefix#37:237": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "↪️slot suffix#37:262": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "prefix#37:312": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "suffix#37:337": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "md",
+            "variantOptions": [
+              "md",
+              "lg",
+              "sm"
+            ]
+          },
+          "filled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "focused": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "read only": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "clear all": {
+            "type": "VARIANT",
+            "defaultValue": "true",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          },
+          "negative": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "39:19399"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "39:19398",
+        "name": "Tag select",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Time picker",
+    "id": "31:6856",
+    "sets": [],
+    "single": [],
+    "children": []
+  },
+  {
+    "page": "Verification code input",
+    "id": "31:6848",
+    "sets": [],
+    "single": [],
+    "children": []
+  },
+  {
+    "page": "Upload",
+    "id": "31:6837",
+    "sets": [],
+    "single": [],
+    "children": []
+  },
+  {
+    "page": "Drawer",
+    "id": "31:6854",
+    "sets": [
+      {
+        "id": "32:7576",
+        "name": "Drawer",
+        "count": 4,
+        "properties": {
+          "✏️heading#31:402": {
+            "type": "TEXT",
+            "defaultValue": "Modal title"
+          },
+          "↪️slot body#31:407": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "↪️slot addition item#31:412": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "↪️slot actions#31:417": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": true
+            },
+            "preferredValues": [
+              {
+                "type": "COMPONENT_SET",
+                "key": "fe9e6cc7e833479d9b1df3953ec6ecf851eb5698"
+              }
+            ]
+          },
+          "addition item#31:422": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "footer": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "divider": {
+            "type": "VARIANT",
+            "defaultValue": "true",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          }
+        },
+        "sample": "32:7577"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "32:7576",
+        "name": "Drawer",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "FAB",
+    "id": "31:6861",
+    "sets": [
+      {
+        "id": "32:7638",
+        "name": "FAB",
+        "count": 15,
+        "properties": {
+          "↪️slot icon#13:321": {
+            "type": "INSTANCE_SWAP",
+            "defaultValue": "30:7363",
+            "preferredValues": [
+              {
+                "type": "COMPONENT",
+                "key": "96b27367f1fb00ac7e988b3cfc31d5060aba75e7"
+              }
+            ]
+          },
+          "size": {
+            "type": "VARIANT",
+            "defaultValue": "md",
+            "variantOptions": [
+              "md",
+              "sm",
+              "lg"
+            ]
+          },
+          "hover": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "disabled": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "selected": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "loading": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "capsule": {
+            "type": "VARIANT",
+            "defaultValue": "true",
+            "variantOptions": [
+              "true"
+            ]
+          }
+        },
+        "sample": "32:7641"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "32:7638",
+        "name": "FAB",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Modal",
+    "id": "31:6859",
+    "sets": [
+      {
+        "id": "31:9328",
+        "name": "Modal",
+        "count": 4,
+        "properties": {
+          "✏️heading#31:402": {
+            "type": "TEXT",
+            "defaultValue": "Modal title"
+          },
+          "↪️slot body#31:407": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "↪️slot addition item#31:412": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "↪️slot actions#31:417": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": true
+            },
+            "preferredValues": [
+              {
+                "type": "COMPONENT_SET",
+                "key": "fe9e6cc7e833479d9b1df3953ec6ecf851eb5698"
+              }
+            ]
+          },
+          "addition item#31:422": {
+            "type": "BOOLEAN",
+            "defaultValue": false
+          },
+          "footer": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          },
+          "divider": {
+            "type": "VARIANT",
+            "defaultValue": "true",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          }
+        },
+        "sample": "31:9327"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "31:9328",
+        "name": "Modal",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Popconfirm",
+    "id": "31:6852",
+    "sets": [
+      {
+        "id": "32:7449",
+        "name": "Popconfirm",
+        "count": 2,
+        "properties": {
+          "✏️message#31:329": {
+            "type": "TEXT",
+            "defaultValue": "This is a message context"
+          },
+          "icon#31:351": {
+            "type": "BOOLEAN",
+            "defaultValue": true
+          },
+          "✏️description#31:362": {
+            "type": "TEXT",
+            "defaultValue": "This is a message context"
+          },
+          "negative": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "32:7450"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "32:7449",
+        "name": "Popconfirm",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Popover",
+    "id": "31:6853",
+    "sets": [
+      {
+        "id": "32:7529",
+        "name": "Popover",
+        "count": 2,
+        "properties": {
+          "↪️slot content#32:95": {
+            "type": "SLOT",
+            "description": "",
+            "slotSettings": {
+              "stretchChildOnInsert": false,
+              "displayEmptyByDefault": false,
+              "minChildren": null,
+              "maxChildren": null,
+              "allowPreferredValuesOnly": false
+            },
+            "preferredValues": []
+          },
+          "negative": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "32:7530"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "32:7529",
+        "name": "Popover",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Alert",
+    "id": "31:6864",
+    "sets": [
+      {
+        "id": "31:8759",
+        "name": "Alert",
+        "count": 16,
+        "properties": {
+          "↪️slot icon#31:318": {
+            "type": "INSTANCE_SWAP",
+            "defaultValue": "31:7",
+            "preferredValues": [
+              {
+                "type": "COMPONENT",
+                "key": "f5fc6b42e74e5a764ebe3d0109efea93a71a8641"
+              }
+            ]
+          },
+          "✏️message#31:329": {
+            "type": "TEXT",
+            "defaultValue": "This is a message context"
+          },
+          "icon#31:351": {
+            "type": "BOOLEAN",
+            "defaultValue": true
+          },
+          "✏️description#31:368": {
+            "type": "TEXT",
+            "defaultValue": "Description goes here..."
+          },
+          "closable#31:385": {
+            "type": "BOOLEAN",
+            "defaultValue": true
+          },
+          "color": {
+            "type": "VARIANT",
+            "defaultValue": "information",
+            "variantOptions": [
+              "information",
+              "negative",
+              "positive",
+              "neutral"
+            ]
+          },
+          "description": {
+            "type": "VARIANT",
+            "defaultValue": "true",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          },
+          "banner": {
+            "type": "VARIANT",
+            "defaultValue": "false",
+            "variantOptions": [
+              "false",
+              "true"
+            ]
+          }
+        },
+        "sample": "31:8760"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "31:8759",
+        "name": "Alert",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Message",
+    "id": "31:6867",
+    "sets": [
+      {
+        "id": "31:8477",
+        "name": "Message",
+        "count": 10,
+        "properties": {
+          "↪️slot icon#31:318": {
+            "type": "INSTANCE_SWAP",
+            "defaultValue": "31:7",
+            "preferredValues": [
+              {
+                "type": "COMPONENT",
+                "key": "f5fc6b42e74e5a764ebe3d0109efea93a71a8641"
+              }
+            ]
+          },
+          "✏️message#31:329": {
+            "type": "TEXT",
+            "defaultValue": "This is a message context"
+          },
+          "action#31:340": {
+            "type": "BOOLEAN",
+            "defaultValue": true
+          },
+          "icon#31:351": {
+            "type": "BOOLEAN",
+            "defaultValue": true
+          },
+          "color": {
+            "type": "VARIANT",
+            "defaultValue": "information",
+            "variantOptions": [
+              "information",
+              "negative",
+              "positive",
+              "loading",
+              "neutral"
+            ]
+          },
+          "actions": {
+            "type": "VARIANT",
+            "defaultValue": "true",
+            "variantOptions": [
+              "true",
+              "false"
+            ]
+          }
+        },
+        "sample": "31:8476"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "31:8477",
+        "name": "Message",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "Tipseen",
+    "id": "31:6866",
+    "sets": [],
+    "single": [],
+    "children": []
+  },
+  {
+    "page": "Toast",
+    "id": "31:6865",
+    "sets": [
+      {
+        "id": "31:8496",
+        "name": "Message",
+        "count": 5,
+        "properties": {
+          "↪️slot icon#31:318": {
+            "type": "INSTANCE_SWAP",
+            "defaultValue": "31:7",
+            "preferredValues": [
+              {
+                "type": "COMPONENT",
+                "key": "f5fc6b42e74e5a764ebe3d0109efea93a71a8641"
+              }
+            ]
+          },
+          "✏️message#31:329": {
+            "type": "TEXT",
+            "defaultValue": "This is a message context"
+          },
+          "icon#31:351": {
+            "type": "BOOLEAN",
+            "defaultValue": true
+          },
+          "✏️description#31:362": {
+            "type": "TEXT",
+            "defaultValue": "This is a message context"
+          },
+          "color": {
+            "type": "VARIANT",
+            "defaultValue": "information",
+            "variantOptions": [
+              "information",
+              "negative",
+              "positive",
+              "loading",
+              "neutral"
+            ]
+          }
+        },
+        "sample": "31:8497"
+      }
+    ],
+    "single": [],
+    "children": [
+      {
+        "id": "31:8496",
+        "name": "Message",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  },
+  {
+    "page": "UI",
+    "id": "78:2",
+    "sets": [
+      {
+        "id": "78:6768",
+        "name": "Navigation menu",
+        "count": 6,
+        "sample": "78:6767"
+      },
+      {
+        "id": "85:7154",
+        "name": "Progress",
+        "count": 3,
+        "sample": "85:7153"
+      }
+    ],
+    "single": [
+      {
+        "id": "78:6668",
+        "name": "antigravity 1"
+      },
+      {
+        "id": "78:6667",
+        "name": "codex 1"
+      },
+      {
+        "id": "78:6666",
+        "name": "kimi 1"
+      },
+      {
+        "id": "78:6665",
+        "name": "qoder 1"
+      },
+      {
+        "id": "78:6664",
+        "name": "claudecode 1"
+      }
+    ],
+    "children": [
+      {
+        "id": "78:3",
+        "name": "Home",
+        "type": "FRAME"
+      },
+      {
+        "id": "85:7740",
+        "name": "Tag",
+        "type": "INSTANCE"
+      },
+      {
+        "id": "78:6668",
+        "name": "antigravity 1",
+        "type": "COMPONENT"
+      },
+      {
+        "id": "78:6667",
+        "name": "codex 1",
+        "type": "COMPONENT"
+      },
+      {
+        "id": "78:6666",
+        "name": "kimi 1",
+        "type": "COMPONENT"
+      },
+      {
+        "id": "78:6665",
+        "name": "qoder 1",
+        "type": "COMPONENT"
+      },
+      {
+        "id": "78:6664",
+        "name": "claudecode 1",
+        "type": "COMPONENT"
+      },
+      {
+        "id": "78:6768",
+        "name": "Navigation menu",
+        "type": "COMPONENT_SET"
+      },
+      {
+        "id": "85:7154",
+        "name": "Progress",
+        "type": "COMPONENT_SET"
+      }
+    ]
+  }
+]

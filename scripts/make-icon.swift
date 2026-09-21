@@ -1,21 +1,32 @@
 import AppKit
+
+// Build concatenates NicoSVGPath.swift before this script; only path elements
+// with explicit solid fills are accepted, keeping SVG the single source of truth.
+final class IconSVG: NSObject, XMLParserDelegate {
+    var paths: [(CGPath, CGColor)] = []
+    func parser(_ parser: XMLParser, didStartElement elementName: String, namespaceURI: String?, qualifiedName: String?, attributes: [String: String]) {
+        guard elementName == "path", let data = attributes["d"], let fill = attributes["fill"], fill.hasPrefix("#"), fill.count == 7,
+              let value = UInt32(fill.dropFirst(), radix: 16) else { return }
+        paths.append((NicoSVGPath.parse(data), CGColor(red: CGFloat((value >> 16) & 255) / 255,
+            green: CGFloat((value >> 8) & 255) / 255, blue: CGFloat(value & 255) / 255, alpha: 1)))
+    }
+}
 let output = URL(fileURLWithPath: CommandLine.arguments[1])
+let source = URL(fileURLWithPath: CommandLine.arguments.count > 2 ? CommandLine.arguments[2] : "Resources/Branding/Creature.svg")
+let delegate = IconSVG()
+let parser = XMLParser(data: try Data(contentsOf: source)); parser.delegate = delegate
+precondition(parser.parse() && delegate.paths.count == 4, "Invalid app icon SVG")
 try FileManager.default.createDirectory(at: output, withIntermediateDirectories: true)
 for size in [16, 32, 128, 256, 512] {
     for scale in [1, 2] {
         let pixels = size * scale
-        let image = NSImage(size: NSSize(width: pixels, height: pixels))
-        image.lockFocus()
-        let p = CGFloat(pixels)
-        let base = NSBezierPath(roundedRect: NSRect(x: p * 0.08, y: p * 0.08, width: p * 0.84, height: p * 0.84), xRadius: p * 0.2, yRadius: p * 0.2)
-        NSGradient(starting: NSColor(calibratedRed: 0.13, green: 0.17, blue: 0.25, alpha: 1), ending: NSColor(calibratedRed: 0.035, green: 0.045, blue: 0.08, alpha: 1))!.draw(in: base, angle: -60)
-        for (i, height) in [0.24, 0.44, 0.34].enumerated() {
-            let rect = NSRect(x: p * (0.25 + Double(i) * 0.18), y: p * 0.28, width: p * 0.12, height: p * height)
-            NSColor(calibratedRed: i == 1 ? 0.52 : 0.83, green: i == 1 ? 0.85 : 0.9, blue: 1, alpha: 1).setFill()
-            NSBezierPath(roundedRect: rect, xRadius: p * 0.035, yRadius: p * 0.035).fill()
-        }
-        image.unlockFocus()
-        let rep = NSBitmapImageRep(data: image.tiffRepresentation!)!
+        let context = CGContext(data: nil, width: pixels, height: pixels, bitsPerComponent: 8,
+            bytesPerRow: pixels * 4, space: CGColorSpaceCreateDeviceRGB(),
+            bitmapInfo: CGImageAlphaInfo.premultipliedLast.rawValue)!
+        context.translateBy(x: 0, y: CGFloat(pixels))
+        context.scaleBy(x: CGFloat(pixels) / 1024, y: -CGFloat(pixels) / 1024)
+        for (path, color) in delegate.paths { context.setFillColor(color); context.addPath(path); context.fillPath() }
+        let rep = NSBitmapImageRep(cgImage: context.makeImage()!)
         let name = "icon_\(size)x\(size)\(scale == 2 ? "@2x" : "").png"
         try rep.representation(using: .png, properties: [:])!.write(to: output.appendingPathComponent(name))
     }
