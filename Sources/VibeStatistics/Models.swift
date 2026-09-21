@@ -69,6 +69,31 @@ struct LocalUsage: Codable, Sendable {
     let messageCount: Int
     let incomplete: Bool
     let scope: String
+    // Optional for snapshots saved before lifetime log collection was introduced.
+    var allTimeDays: [LocalUsageDay]? = nil
+
+    enum Period { case week, month, allTime }
+    func tokens(in period: Period, now: Date = Date(), timeZone: TimeZone = .current) -> Double? {
+        guard let allTimeDays else { return nil }
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = timeZone
+        calendar.firstWeekday = 2 // Monday, independent of the system locale.
+        let start: Date
+        switch period {
+        case .week: start = calendar.dateInterval(of: .weekOfYear, for: now)!.start
+        case .month: start = calendar.dateInterval(of: .month, for: now)!.start
+        case .allTime: start = .distantPast
+        }
+        let formatter = DateFormatter()
+        formatter.calendar = calendar
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = timeZone
+        formatter.dateFormat = "yyyy-MM-dd"
+        return allTimeDays.reduce(0) { total, day in
+            guard let date = formatter.date(from: day.date), date >= start, date <= now else { return total }
+            return total + day.input + day.output
+        }
+    }
 }
 
 struct UsageSnapshot: Codable, Sendable {
@@ -122,5 +147,29 @@ enum History {
             if last[day] == nil || date > last[day]!.0 { last[day] = (date, m.value) }
         }
         return last.map { DailyPoint(date: $0.key, actualDate: $0.value.0, value: $0.value.1) }.sorted { $0.date < $1.date }
+    }
+    // Daily observed consumption: drops between consecutive observations inside the same quota
+    // window. Resets, top-ups and capture gaps are never counted; days without a drop stay absent.
+    static func consumed(_ snapshots: [UsageSnapshot], account: String, metric: String, since: Date, calendar: Calendar = .current, maxGap: TimeInterval = 1800) -> [DailyPoint] {
+        let ordered = snapshots.filter { $0.account == account }.sorted { ($0.date ?? .distantPast) < ($1.date ?? .distantPast) }
+        var previous: (date: Date, value: Double, reset: Double?)?
+        var totals: [Date: (Date, Double)] = [:]
+        for s in ordered {
+            guard let date = s.date, let m = s.metrics?.first(where: { $0.id == metric }), m.kind == "quota" else { previous = nil; continue }
+            if s.provider == "glm", m.resetAt == nil { previous = nil; continue }
+            defer { previous = (date, m.value, m.resetAt) }
+            guard let last = previous, date.timeIntervalSince(last.date) <= maxGap else { continue }
+            let sameWindow: Bool
+            if let a = last.reset, let b = m.resetAt {
+                // Antigravity reset times are CLI countdown estimates and drift by minutes;
+                // a real window reset shifts them by hours.
+                sameWindow = s.provider == "glm" ? a == b : abs(a - b) <= 900
+            } else { sameWindow = true }
+            guard sameWindow, m.value < last.value else { continue }
+            let day = calendar.startOfDay(for: date)
+            let drop = last.value - m.value
+            totals[day] = (date, (totals[day]?.1 ?? 0) + drop)
+        }
+        return totals.filter { $0.key >= since }.map { DailyPoint(date: $0.key, actualDate: $0.value.0, value: $0.value.1) }.sorted { $0.date < $1.date }
     }
 }

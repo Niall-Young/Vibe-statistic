@@ -66,7 +66,6 @@ Quota available'''
         with b.child(['/bin/sleep','30'],stdout=subprocess.DEVNULL) as p:
             pid=p.pid;self.assertIsNone(p.poll())
         self.assertIsNotNone(p.poll());self.assertEqual(b.CHILDREN,[])
-
 if __name__=='__main__':unittest.main()
 
 class LocalUsageTests(unittest.TestCase):
@@ -85,6 +84,23 @@ class LocalUsageTests(unittest.TestCase):
             self.assertEqual(result['days'][0]['input'],200)
             self.assertIsNone(result['days'][0]['cacheWrite'])
             self.assertFalse(result['incomplete'])
+
+    def test_lifetime_includes_old_files_but_detail_stays_thirty_days(self):
+        import tempfile,json,datetime
+        now=time.time()
+        def record(ident, age):
+            return {'type':'assistant','timestamp':datetime.datetime.fromtimestamp(now-age*86400,datetime.timezone.utc).isoformat(),
+                    'message':{'id':ident,'model':'deepseek-flash','usage':{'input_tokens':100,'output_tokens':20}}}
+        with tempfile.TemporaryDirectory() as d:
+            root=pathlib.Path(d)
+            old=root/'old.jsonl';old.write_text(json.dumps(record('old',80)))
+            os.utime(old,(now-80*86400,now-80*86400))
+            (root/'recent.jsonl').write_text('\n'.join(json.dumps(r) for r in [record('recent',1),record('old',80),record('future',-1)]))
+            result=b.local_deepseek_usage(root,now)
+            self.assertEqual(sum(row['input']+row['output'] for row in result['allTimeDays']),240)
+            self.assertEqual(sum(row['input']+row['output'] for row in result['days']),120)
+            self.assertEqual(result['messageCount'],1)
+
 
 class WorkspaceIsolationTests(unittest.TestCase):
     def test_cli_and_version_probe_cannot_discover_home_repository(self):
@@ -135,7 +151,66 @@ print('boundary-ok')
 """
             # An env-clearing grandchild simulates CLIs discarding GIT_* settings.
             wrapper='import subprocess,sys; subprocess.run(["/usr/bin/python3","-c",sys.argv[1],sys.argv[2]],env={},check=True)'
-            args += ['-f',str(ROOT/'Helpers/query.sb'),'/usr/bin/python3','-c',wrapper,probe,str(home)]
+            args += ['-D','APP_RESOURCES='+str(ROOT/'Helpers'),'-f',str(ROOT/'Helpers/query.sb'),'/usr/bin/python3','-c',wrapper,probe,str(home)]
             result=subprocess.run(args,capture_output=True,text=True,timeout=10)
             self.assertEqual(result.returncode,0,result.stderr)
             self.assertEqual(result.stdout.strip(),'boundary-ok')
+
+import json
+from unittest import mock
+bridge = b
+
+class GLMTests(unittest.TestCase):
+    def test_percentage_is_used_and_zero_remaining_is_valid(self):
+        data = {'code': 200, 'data': {'limits': [
+            {'type': 'TOKENS_LIMIT', 'unit': 3, 'number': 5, 'percentage': 25, 'nextResetTime': 1900000000000},
+            {'type': 'TOKENS_LIMIT', 'unit': 6, 'number': 1, 'percentage': 100},
+            {'type': 'TIME_LIMIT', 'unit': 5, 'number': 1, 'currentValue': 3, 'usage': 10}
+        ]}}
+        metrics = bridge.parse_glm(data)
+        self.assertEqual([m['value'] for m in metrics], [75, 0, 7])
+        self.assertEqual(metrics[0]['used'], 25)
+        self.assertEqual(metrics[0]['resetAt'], 1900000000)
+        self.assertIsNone(metrics[1]['resetAt'])
+        self.assertEqual(metrics[2]['unit'], '次')
+        self.assertEqual(len(set(m['id'] for m in metrics)), 3)
+
+    def test_missing_unknown_and_bad_values_are_not_zero(self):
+        self.assertEqual(bridge.parse_glm({'limits': [{'type': 'TOKENS_LIMIT'}]}), [])
+        self.assertEqual(bridge.parse_glm({'limits': [{'type': 'UNKNOWN', 'percentage': 10}]}), [])
+        for data in [[], {'success': False}, {'data': {}}, {'limits': [None]},
+                     {'limits': [{'type': 'TOKENS_LIMIT', 'percentage': -1}]},
+                     {'limits': [{'type': 'TOKENS_LIMIT', 'percentage': 101}]},
+                     {'limits': [{'type': 'TIME_LIMIT', 'currentValue': 11, 'usage': 10}]}]:
+            with self.assertRaises(bridge.QueryError): bridge.parse_glm(data)
+        metric = bridge.parse_glm({'limits': [{'type': 'TOKENS_LIMIT', 'percentage': 20}]})[0]
+        self.assertIn('未注明', metric['title'])
+        self.assertIsNone(metric['resetAt'])
+        with self.assertRaises(bridge.QueryError):
+            bridge.parse_glm({'limits': [{'type': 'TOKENS_LIMIT', 'percentage': 20}] * 2})
+
+    def test_fixed_official_endpoint_and_service_isolation(self):
+        with mock.patch.object(bridge, 'get', return_value={'limits': [{'type': 'TOKENS_LIMIT', 'percentage': 40}]}) as get:
+            result = bridge.glm({'secret': 'fake-glm-key', 'path': 'https://evil.test'})
+            get.assert_called_once_with('https://open.bigmodel.cn/api/monitor/usage/quota/limit', 'fake-glm-key', raw_authorization=True)
+            self.assertEqual(result['provider'], 'glm')
+            self.assertEqual(result['account'], bridge.fingerprint('fake-glm-key'))
+            self.assertNotIn('fake-glm-key', json.dumps(result))
+        with mock.patch.object(bridge, 'get') as get:
+            with self.assertRaises(bridge.QueryError): bridge.glm({})
+            with self.assertRaises(bridge.QueryError): bridge.deepseek({'explicitSecret': 'true'})
+            get.assert_not_called()
+
+    def test_redirects_never_forward_credentials(self):
+        with self.assertRaises(bridge.QueryError):
+            bridge.NoRedirect().redirect_request(None, None, 302, '', {}, 'https://evil.test')
+
+    def test_raw_authorization_does_not_add_bearer(self):
+        response = mock.MagicMock()
+        response.__enter__.return_value.read.return_value = b'{"limits": []}'
+        opener = mock.MagicMock()
+        opener.open.return_value = response
+        with mock.patch.object(bridge.urllib.request, 'build_opener', return_value=opener):
+            bridge.get('https://open.bigmodel.cn/api/monitor/usage/quota/limit', 'fake', raw_authorization=True)
+            request = opener.open.call_args.args[0]
+            self.assertEqual(request.get_header('Authorization'), 'fake')

@@ -80,9 +80,15 @@ def snapshot(provider, account, source, metrics, plan=None):
     if not metrics: raise QueryError('unavailable','服务未返回可用额度，请检查登录或 CLI 版本')
     return dict(provider=provider,account=fingerprint(account),source=source,metrics=metrics,plan=plan,collectedAt=time.time(),status='ok')
 
-def get(url, key=None, local=False):
-    opener=urllib.request.build_opener(urllib.request.ProxyHandler({})) if local else urllib.request.build_opener()
-    req=urllib.request.Request(url,headers={'Authorization':'Bearer '+key} if key else {})
+class NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise QueryError('network', '额度查询不允许重定向')
+
+def get(url, key=None, local=False, raw_authorization=False):
+    handlers = [NoRedirect()]
+    if local: handlers.append(urllib.request.ProxyHandler({}))
+    opener = urllib.request.build_opener(*handlers)
+    req=urllib.request.Request(url,headers={'Authorization':key if raw_authorization else 'Bearer '+key} if key else {})
     try:
         with opener.open(req,timeout=18) as r: return json.load(r)
     except urllib.error.HTTPError as e:
@@ -228,7 +234,6 @@ def local_deepseek_usage(root=None, now=None):
     messages={};incomplete=False
     for path in root.glob('**/*.jsonl'):
         try:
-            if path.stat().st_mtime<cutoff: continue
             with path.open() as file:
                 for line in file:
                     try: record=json.loads(line)
@@ -237,7 +242,7 @@ def local_deepseek_usage(root=None, now=None):
                     msg=record.get('message') or {};model=msg.get('model','')
                     if not model.startswith('deepseek'):continue
                     stamp=epoch(record.get('timestamp'));ident=msg.get('id');usage=msg.get('usage')
-                    if stamp is None or stamp<cutoff or stamp>now or not usage:continue
+                    if stamp is None or stamp>now or not usage:continue
                     if not ident:incomplete=True;continue
                     key=(model,ident)
                     fields={'input':'input_tokens','output':'output_tokens','cacheRead':'cache_read_input_tokens','cacheWrite':'cache_creation_input_tokens'}
@@ -250,19 +255,23 @@ def local_deepseek_usage(root=None, now=None):
                         for k,v in values.items():
                             if v is not None:messages[key][k]=max(messages[key].get(k) or 0,v)
         except (OSError,UnicodeError):incomplete=True
-    days={}
+    days={};recent_days={};recent_count=0
     for record in messages.values():
         day=datetime.datetime.fromtimestamp(record['timestamp']).strftime('%Y-%m-%d')
-        row=days.setdefault(day,dict(date=day,input=0,output=0,cacheRead=0,cacheWrite=0))
-        for field in ('input','output','cacheRead','cacheWrite'):
-            if record[field] is None:row[field]=None
-            elif row[field] is not None:row[field]+=int(record[field])
+        targets=[days]
+        if record['timestamp']>=cutoff:
+            targets.append(recent_days);recent_count+=1
+        for target in targets:
+            row=target.setdefault(day,dict(date=day,input=0,output=0,cacheRead=0,cacheWrite=0))
+            for field in ('input','output','cacheRead','cacheWrite'):
+                if record[field] is None:row[field]=None
+                elif row[field] is not None:row[field]+=int(record[field])
     if not messages:return None
-    return dict(days=sorted(days.values(),key=lambda x:x['date']),messageCount=len(messages),incomplete=incomplete,scope='本机全部 DeepSeek 会话，不按 API Key 归因')
+    return dict(allTimeDays=sorted(days.values(),key=lambda x:x['date']),days=sorted(recent_days.values(),key=lambda x:x['date']),messageCount=recent_count,incomplete=incomplete,scope='本机全部 DeepSeek 会话，不按 API Key 归因')
 
 def deepseek(cfg):
     secret=cfg.get('secret')
-    if not secret:
+    if not secret and not cfg.get('explicitSecret'):
         try:
             env=json.loads((HOME/'.claude/settings.json').read_text()).get('env',{})
             if urllib.parse.urlparse(env.get('ANTHROPIC_BASE_URL','')).hostname!='api.deepseek.com': raise QueryError('auth','Claude Code 未配置 DeepSeek 官方服务，请填入官方 API Key')
@@ -280,6 +289,52 @@ def deepseek(cfg):
     result=snapshot('deepseek',secret,'官方 · DeepSeek API（按 Key 隔离）',metrics,'按量付费')
     result['localUsage']=local_deepseek_usage()
     return result
+
+def parse_glm(data):
+    if not isinstance(data, dict): raise QueryError('format', '智谱返回了无法识别的数据')
+    if data.get('success') is False or data.get('code') not in (None, 0, 200, '0', '200'):
+        raise QueryError('auth', '智谱未返回套餐额度，请检查个人 Coding Plan 与 API Key')
+    payload = data.get('data', data)
+    if not isinstance(payload, dict) or not isinstance(payload.get('limits'), list):
+        raise QueryError('format', '智谱未返回可识别的配额列表')
+    metrics = []
+    seen = set()
+    for item in payload['limits']:
+        if not isinstance(item, dict): raise QueryError('format', '智谱配额格式异常')
+        kind = item.get('type')
+        if kind not in ('TOKENS_LIMIT', 'TIME_LIMIT'): continue
+        # Do not infer five-hour/week windows from ordering or reset timestamps.
+        window = item.get('unit')
+        amount = item.get('number')
+        identity = 'glm.%s.%s.%s' % (kind, window, amount)
+        if identity in seen: raise QueryError('format', '智谱返回了无法区分的配额窗口')
+        seen.add(identity)
+        title = 'Coding Plan' if kind == 'TOKENS_LIMIT' else 'MCP 工具'
+        # Preserve only an explicit service-provided window label. Numeric unit
+        # enums alone are not enough evidence to promise a particular duration.
+        window_name = item.get('windowName')
+        title += ' · ' + (window_name if isinstance(window_name, str) and 0 < len(window_name) < 60 else '配额窗口未注明')
+        reset = epoch(item.get('nextResetTime'))
+        if reset is not None and (not math.isfinite(reset) or reset <= 0): reset = None
+        used_percentage = number(item.get('percentage'))
+        used = number(item.get('currentValue'))
+        total = number(item.get('usage'))
+        note = '服务账户共享额度，不代表单个 Agent 用量'
+        if reset is None: note += '；未提供重置时间，不计算消耗'
+        if kind == 'TIME_LIMIT' and used is not None and total is not None:
+            if used < 0 or total < 0 or used > total: raise QueryError('format', '智谱次数额度超出范围')
+            metrics.append(metric(identity, title + '剩余次数', total-used, '次', used=used, total=total, reset=reset, note=note))
+        elif used_percentage is not None:
+            if not 0 <= used_percentage <= 100: raise QueryError('format', '智谱已用百分比超出范围')
+            metrics.append(metric(identity, title + '剩余额度', 100-used_percentage, used=used_percentage, total=100, reset=reset, note=note))
+    return metrics
+
+def glm(cfg):
+    secret = cfg.get('secret')
+    if not secret: raise QueryError('auth', '请在设置中添加智谱个人 GLM Coding Plan API Key')
+    data = get('https://open.bigmodel.cn/api/monitor/usage/quota/limit', secret, raw_authorization=True)
+    return snapshot('glm', secret, '官方 · 智谱 GLM Coding Plan（账户共享额度）', parse_glm(data), 'GLM Coding Plan · 国内个人版')
+
 
 def parse_agy(text,now=None):
     now=now or time.time();metrics=[];group=None;window=None
@@ -362,7 +417,7 @@ def main():
     # Stable empty directory used exclusively for metadata-only CLI processes.
     cfg['cwd']=str(query_workspace())
     try:
-        result={'codex':codex,'kimi':kimi,'qoder':qoder,'deepseek':deepseek,'antigravity':antigravity}[provider](cfg)
+        result={'codex':codex,'kimi':kimi,'qoder':qoder,'deepseek':deepseek,'glm':glm,'antigravity':antigravity}[provider](cfg)
         if result.get('status')=='ok' and provider in ('codex','kimi','qoder'):
             fallback={'codex':'~/.local/bin/codex','kimi':'~/.kimi-code/bin/kimi','qoder':'~/.qoder-cn/entry/qodercn'}[provider]
             try:

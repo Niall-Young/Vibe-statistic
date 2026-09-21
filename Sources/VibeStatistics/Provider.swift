@@ -2,7 +2,7 @@ import Foundation
 import Security
 
 protocol UsageProvider: Sendable {
-    func fetch(_ agent: Agent, path: String, node: String, secret: String?) async -> UsageSnapshot
+    func fetch(_ agent: UsageSource, path: String, node: String, secret: String?) async -> UsageSnapshot
 }
 
 final class ProcessRegistry: @unchecked Sendable {
@@ -18,7 +18,7 @@ final class ProcessRegistry: @unchecked Sendable {
 
 struct CLIProvider: UsageProvider {
     let helper: URL
-    func fetch(_ agent: Agent, path: String, node: String, secret: String?) async -> UsageSnapshot {
+    func fetch(_ agent: UsageSource, path: String, node: String, secret: String?) async -> UsageSnapshot {
         let id = UUID()
         return await withTaskCancellationHandler {
             await Task.detached(priority: .utility) {
@@ -32,16 +32,19 @@ struct CLIProvider: UsageProvider {
                 for (key, folder) in protectedFolders {
                     arguments += ["-D", "\(key)=\(home.appendingPathComponent(folder).resolvingSymlinksInPath().path)"]
                 }
+                arguments += ["-D", "APP_RESOURCES=\(helper.deletingLastPathComponent().deletingLastPathComponent().resolvingSymlinksInPath().path)"]
                 arguments += ["-f", helper.deletingLastPathComponent().appendingPathComponent("query.sb").path,
-                              "/usr/bin/python3", helper.path]
+                              BundledRuntime.python.path, "-I", "-B", helper.path]
                 process.arguments = arguments
                 process.standardInput = input; process.standardOutput = output
                 process.standardError = FileHandle.nullDevice
                 var environment = ProcessInfo.processInfo.environment
-                environment["PATH"] = "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:\(NSHomeDirectory())/.local/bin"
+                environment["PATH"] = BundledRuntime.node.deletingLastPathComponent().path + ":" + "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:\(NSHomeDirectory())/.local/bin"
+                for key in Array(environment.keys) where key.hasPrefix("PYTHON") || key.hasPrefix("DYLD_") || key == "NODE_OPTIONS" || key == "NODE_PATH" { environment.removeValue(forKey: key) }
                 environment["PYTHONDONTWRITEBYTECODE"] = "1"
+                environment["SSL_CERT_FILE"] = BundledRuntime.root.appendingPathComponent("cacert.pem").path
                 process.environment = environment
-                var config = ["provider": agent.rawValue, "path": path, "node": node]
+                var config = ["provider": agent.rawValue, "path": path, "node": node, "explicitSecret": "true"]
                 if let secret, !secret.isEmpty { config["secret"] = secret }
                 defer { ProcessRegistry.shared.remove(id) }
                 do {
@@ -76,7 +79,7 @@ struct CLIProvider: UsageProvider {
 }
 
 extension UsageSnapshot {
-    static func failure(_ agent: Agent, code: String, message: String) -> Self {
+    static func failure(_ agent: UsageSource, code: String, message: String) -> Self {
         Self(provider: agent.rawValue, status: "error", errorCode: code, message: message)
     }
 }
@@ -84,14 +87,14 @@ extension UsageSnapshot {
 @MainActor enum Keychain {
     static let reader = CredentialReader()
     static let service = "com.vibestatistics.credentials"
-    static func read(_ agent: Agent, allowInteraction: Bool = false) throws -> String? {
+    static func read(_ agent: UsageSource, allowInteraction: Bool = false) throws -> String? {
         try reader.read(agent, allowInteraction: allowInteraction)
     }
-    static func save(_ value: String, for agent: Agent) throws {
+    static func save(_ value: String, for agent: UsageSource) throws {
         try persist(value, for: agent)
         reader.didSave(value, for: agent)
     }
-    private static func persist(_ value: String, for agent: Agent) throws {
+    private static func persist(_ value: String, for agent: UsageSource) throws {
         let query: [String: Any] = [kSecClass as String: kSecClassGenericPassword, kSecAttrService as String: service, kSecAttrAccount as String: agent.rawValue]
         if value.isEmpty {
             let code = SecItemDelete(query as CFDictionary)
@@ -111,10 +114,10 @@ extension UsageSnapshot {
 
 /// Credentials stay in memory only; polling never requests system authentication UI.
 @MainActor final class CredentialReader {
-    private(set) var cache: [Agent: String] = [:]
-    private var failures: [Agent: OSStatus] = [:]
-    private var missing: Set<Agent> = []
-    func didSave(_ value: String, for agent: Agent) {
+    private(set) var cache: [UsageSource: String] = [:]
+    private var failures: [UsageSource: OSStatus] = [:]
+    private var missing: Set<UsageSource> = []
+    func didSave(_ value: String, for agent: UsageSource) {
         cache[agent] = value.isEmpty ? nil : value
         failures.removeValue(forKey: agent)
         if value.isEmpty { missing.insert(agent) } else { missing.remove(agent) }
@@ -125,7 +128,7 @@ extension UsageSnapshot {
         let status = SecItemCopyMatching(query as CFDictionary, &result)
         return (status, result as? Data)
     }) { self.lookup = lookup }
-    func read(_ agent: Agent, allowInteraction: Bool = false) throws -> String? {
+    func read(_ agent: UsageSource, allowInteraction: Bool = false) throws -> String? {
         if let value = cache[agent] { return value }
         if !allowInteraction {
             if let status = failures[agent] { throw NSError(domain: NSOSStatusErrorDomain, code: Int(status)) }

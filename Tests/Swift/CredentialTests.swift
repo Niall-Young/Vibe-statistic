@@ -72,7 +72,7 @@ final class CredentialTests: XCTestCase {
         let reader = CredentialReader()
         let start = Date()
         for _ in 0..<10 {
-            for agent: Agent in [.deepseek, .qoder] {
+            for agent: UsageSource in [.deepseek, .qoder] {
                 do { _ = try reader.read(agent) }
                 catch { XCTAssertEqual((error as NSError).domain, NSOSStatusErrorDomain) }
             }

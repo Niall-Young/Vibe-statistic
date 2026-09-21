@@ -10,3 +10,6 @@
     (subpath (param "MOVIES"))
     (subpath (param "MUSIC"))
     (subpath (param "HOME_GIT")))
+
+; Only app-owned code/resources may be read when the app is in Downloads/Desktop.
+(allow file-read* (subpath (param "APP_RESOURCES")))

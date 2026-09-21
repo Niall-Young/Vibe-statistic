@@ -4,7 +4,7 @@ import SwiftData
 
 actor FakeProvider: UsageProvider {
     var count = 0
-    func fetch(_ agent: Agent, path: String, node: String, secret: String?) async -> UsageSnapshot {
+    func fetch(_ agent: UsageSource, path: String, node: String, secret: String?) async -> UsageSnapshot {
         count += 1
         try? await Task.sleep(for: .milliseconds(80))
         return UsageSnapshot(provider: agent.rawValue, status: "ok", account: "test", metrics: [UsageMetric(id: "q", title: "Quota", value: 50, unit: "%", kind: "quota")], collectedAt: Date().timeIntervalSince1970)
@@ -14,7 +14,10 @@ actor FakeProvider: UsageProvider {
 final class StoreTests: XCTestCase {
     @MainActor func makeStore(_ provider: FakeProvider = FakeProvider()) throws -> UsageStore {
         let container = try ModelContainer(for: StoredSnapshot.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))
-        return UsageStore(container: container, provider: provider)
+        let defaults = UserDefaults(suiteName: UUID().uuidString)!
+        return UsageStore(container: container, provider: provider, defaults: defaults,
+                          detector: AgentDetector(environmentPath: "", executable: { _ in true }),
+                          credential: { _ in nil }, claudeConfiguration: { nil })
     }
     @MainActor func testFailureRetainsPreviousSnapshot() throws {
         let store = try makeStore()

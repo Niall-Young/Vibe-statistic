@@ -14,5 +14,5 @@ export VIBE_VERIFY_DIR="$PWD/.local/verification"
 import json,pathlib,sys
 p=pathlib.Path('.local/verification/verification.json')
 d=json.loads(p.read_text());print(json.dumps(d,indent=2))
-if d['connected'] != 5 or d['storageError'] != 'none': sys.exit(1)
+if not d['providers'] or d['connected'] != len(d['providers']) or d['storageError'] != 'none': sys.exit(1)
 PY
