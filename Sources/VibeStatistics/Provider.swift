@@ -40,7 +40,9 @@ struct CLIProvider: UsageProvider {
                 process.standardError = FileHandle.nullDevice
                 var environment = ProcessInfo.processInfo.environment
                 environment["PATH"] = BundledRuntime.node.deletingLastPathComponent().path + ":" + "/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:\(NSHomeDirectory())/.local/bin"
-                for key in Array(environment.keys) where key.hasPrefix("PYTHON") || key.hasPrefix("DYLD_") || key == "NODE_OPTIONS" || key == "NODE_PATH" { environment.removeValue(forKey: key) }
+                // CODEX_HOME must not leak in from the launching shell: the codex CLI
+                // hard-fails on a stale path instead of falling back to ~/.codex.
+                for key in Array(environment.keys) where key.hasPrefix("PYTHON") || key.hasPrefix("DYLD_") || key == "NODE_OPTIONS" || key == "NODE_PATH" || key == "CODEX_HOME" { environment.removeValue(forKey: key) }
                 environment["PYTHONDONTWRITEBYTECODE"] = "1"
                 environment["SSL_CERT_FILE"] = BundledRuntime.root.appendingPathComponent("cacert.pem").path
                 process.environment = environment

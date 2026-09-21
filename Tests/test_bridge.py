@@ -66,6 +66,12 @@ Quota available'''
         with b.child(['/bin/sleep','30'],stdout=subprocess.DEVNULL) as p:
             pid=p.pid;self.assertIsNone(p.poll())
         self.assertIsNotNone(p.poll());self.assertEqual(b.CHILDREN,[])
+    def test_cleanup_survives_a_child_that_exited_unreaped(self):
+        # A CLI that dies instantly is still an unreaped zombie when its group is signalled,
+        # and macOS answers EPERM there. Losing the result to that would hide why it died.
+        with b.child(['/bin/sh','-c','exit 1'],stdout=subprocess.DEVNULL) as p: time.sleep(.3)
+        self.assertIsNotNone(p.poll());self.assertEqual(b.CHILDREN,[])
+
 if __name__=='__main__':unittest.main()
 
 class LocalUsageTests(unittest.TestCase):

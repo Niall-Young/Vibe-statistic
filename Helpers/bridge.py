@@ -11,15 +11,20 @@ CHILDREN = []
 class QueryError(Exception):
     def __init__(self, code, message): self.code, self.message = code, message
 
+def kill_group(pid, sig):
+    # macOS reports EPERM, not ESRCH, for the group of an exited but unreaped child.
+    # Delivery failure is never fatal: raising here would suppress the query result.
+    try: os.killpg(pid, sig)
+    except OSError: pass
+
 def cleanup(*_):
-    for p in list(CHILDREN):
-        try: os.killpg(p.pid, signal.SIGTERM)
-        except ProcessLookupError: pass
+    for p in list(CHILDREN): kill_group(p.pid, signal.SIGTERM)
     for p in list(CHILDREN):
         try: p.wait(timeout=1)
         except subprocess.TimeoutExpired:
-            try: os.killpg(p.pid, signal.SIGKILL); p.wait(timeout=1)
-            except (ProcessLookupError, subprocess.TimeoutExpired): pass
+            kill_group(p.pid, signal.SIGKILL)
+            try: p.wait(timeout=1)
+            except subprocess.TimeoutExpired: pass
     CHILDREN.clear()
 
 def terminate(*_):
@@ -45,12 +50,10 @@ def child(args, **kw):
     p = subprocess.Popen(args, start_new_session=True, **kw); CHILDREN.append(p)
     try: yield p
     finally:
-        try: os.killpg(p.pid, signal.SIGTERM)
-        except ProcessLookupError: pass
+        kill_group(p.pid, signal.SIGTERM)
         try: p.wait(timeout=2)
         except subprocess.TimeoutExpired:
-            try: os.killpg(p.pid, signal.SIGKILL)
-            except ProcessLookupError: pass
+            kill_group(p.pid, signal.SIGKILL)
             p.wait()
 
         if p in CHILDREN: CHILDREN.remove(p)
