@@ -9,7 +9,7 @@
 
 ### 项目简介
 
-供本机使用的 SwiftUI + AppKit 菜单栏应用，统一查看 Codex、Kimi Code、Qoder CN（`qodercn`）、Claude Code / DeepSeek、Antigravity CLI。目标环境为 macOS 26、Apple Silicon。无需后台云服务。公开版构建与离线安装包流程已准备；当前不发布 Release，也没有 Developer ID 公证。
+供本机使用的 SwiftUI + AppKit 菜单栏应用，统一查看 Codex、Kimi Code、Qoder CN（`qodercn`）、Claude Code / DeepSeek、Antigravity CLI。目标环境为 macOS 26、Apple Silicon。无需后台云服务。公开版构建与离线安装包流程已就绪，首发版本已通过 GitHub Releases 发布；尚未做 Developer ID 公证。
 
 ### 核心能力
 
@@ -24,9 +24,9 @@
 
 ### 快速开始
 
-普通用户需要 macOS 26 / Apple Silicon，以及已安装的受支持 Agent。完整 `.app` 自带 Python、Node 和桥接依赖，无需 Xcode、npm 或另装运行时。安装包尚未公开发布；当前仅本地构建验证。
+普通用户需要 macOS 26 / Apple Silicon，以及已安装的受支持 Agent。完整 `.app` 自带 Python、Node 和桥接依赖，无需 Xcode、npm 或另装运行时。安装包已通过 GitHub Releases 公开发布。
 
-以后从 GitHub Releases 下载 ZIP，解压后将 `Vibe Statistics.app` 拖入「应用程序」，从访达打开。首版为 ad-hoc 签名，未公证；若系统阻止打开，在确认文件来源后按系统「隐私与安全性」中的提示允许此应用，不关闭 Gatekeeper。更新时退出旧应用，用新版覆盖；历史和偏好继续保留。
+从 GitHub Releases 下载 ZIP（附同名 `.sha256` 可校验完整性），解压后将 `Vibe Statistics.app` 拖入「应用程序」，从访达打开。当前为 ad-hoc 签名、未公证；若系统阻止打开，在确认文件来源后按系统「隐私与安全性」中的提示允许此应用，不关闭 Gatekeeper。安装前先退出正在运行的旧版本；应用内可检查更新，也可手动下载新版覆盖，历史和偏好继续保留。
 
 开发构建需要 Xcode（默认 `/Applications/Xcode.app`）、Swift 6 工具链及 `/usr/bin/python3`；Swift Package 使用 Swift 5 语言模式。构建时联网下载校验过的运行时和锁定依赖：
 
@@ -109,7 +109,7 @@
 
 ### Overview
 
-A personal SwiftUI + AppKit menu bar application for Codex, Kimi Code, Qoder CN (`qodercn`), Claude Code / DeepSeek, and Antigravity CLI. Targets macOS 26 on Apple Silicon. No cloud backend. Distribution builds are prepared, but no Release is being published yet; Developer ID notarization is not included.
+A personal SwiftUI + AppKit menu bar application for Codex, Kimi Code, Qoder CN (`qodercn`), Claude Code / DeepSeek, and Antigravity CLI. Targets macOS 26 on Apple Silicon. No cloud backend. Distribution builds are prepared and the first version has been published on GitHub Releases; Developer ID notarization is not included.
 
 ### Features
 
@@ -123,7 +123,7 @@ A personal SwiftUI + AppKit menu bar application for Codex, Kimi Code, Qoder CN 
 
 ### Quick Start
 
-Users need macOS 26 on Apple Silicon and an installed supported Agent. The complete app includes Python, Node and bridge dependencies; Xcode and npm are not required. No public download has been released yet. Future updates are manual: quit the old app, replace it in Applications and reopen it. History and preferences are retained.
+Users need macOS 26 on Apple Silicon and an installed supported Agent. The complete app includes Python, Node and bridge dependencies; Xcode and npm are not required. Downloads are on GitHub Releases, each ZIP shipping a sibling `.sha256`. Updates are manual: quit the old app, replace it in Applications and reopen it; the app can also check for updates itself. History and preferences are retained.
 
 For source builds, use Xcode (default `/Applications/Xcode.app`), the Swift 6 toolchain and `/usr/bin/python3`. The package uses Swift 5 language mode. Runtime downloads and dependencies are verified/pinned by the build scripts.
 
@@ -200,7 +200,7 @@ VIBE_VERSION=0.1.0 VIBE_BUILD=1 ./scripts/build.sh
 ./scripts/package-release.sh
 ```
 
-`package-release.sh` 只在 `dist/` 生成 ZIP 和 SHA-256，不创建或发布 GitHub Release。`.github/workflows/build.yml` 支持手动构建或版本标签触发，仅上传 Actions artifact，权限为只读，不发布 Release。公开发布目前暂停；发布前需检查仓库历史与 `THIRD_PARTY_NOTICES.md` 中的资源再分发条件。
+`package-release.sh` 只在 `dist/` 生成 ZIP 和 SHA-256，不创建或发布 GitHub Release；发布是单独的手动步骤（`gh release create v<版本> --target main`，并把 ZIP 与 `.sha256` 一起作为资产上传，资产名须保持 `*-arm64.zip` 与对应的 `*.zip.sha256`，否则应用内更新检查找不到）。`.github/workflows/build.yml` 支持手动构建或版本标签触发，仅上传 Actions artifact，权限为只读，不发布 Release。发布前需检查仓库历史与 `THIRD_PARTY_NOTICES.md` 中的资源再分发条件。
 
 Offline UI fixtures: open the complete app with `--offline-preview` (two installed agents sharing GLM demo data), or add `--preview-empty` (no installed agents). These modes use an in-memory database and fake credentials, never live accounts. `scripts/check-bundle.py` validates signatures, architecture, dynamic dependencies, bundled TLS and an offline helper request; it does not replace testing on a separate clean Mac.
 
