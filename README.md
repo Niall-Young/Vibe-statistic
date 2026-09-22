@@ -104,6 +104,10 @@
 - **没有费用估算**：当前仅提供可靠的官方额度、Credits 与余额，不把余额差额、订阅百分比或 Token 按不明价格换算成费用。
 - **本机依赖缺失**：确认 Agent CLI 路径；Node 自定义路径可清空以恢复内置版本。运行时损坏时重新安装完整 `.app`；不能只复制裸可执行文件。
 
+### 开源协议
+
+项目源码以 [MIT License](LICENSE) 发布。打包的第三方组件（Python、Node.js、MingCute 图标、Poppins 字体等）保留各自原有协议，详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)；其中 Qoder CN SDK 的再分发条件需在公开发布前复核。
+
 <a id="english"></a>
 ## English
 
@@ -191,6 +195,10 @@ Local integrations were verified on 2026-09-20 using Codex CLI 0.154.0, Kimi 0.4
 - **Launch-at-login failure**: registration may require approval in System Settings. System protections are not silently weakened.
 - **No cost estimate**: only reliable official quotas, Credits, and balances are shown. Balance differences, subscription percentages, and tokens without known pricing are not converted into spending.
 - **Missing dependencies**: check Agent CLI paths and clear custom Node overrides to use the bundled runtime. Reinstall the complete app if bundled resources are damaged; copying a bare executable is insufficient.
+
+### License
+
+The project source is released under the [MIT License](LICENSE). Bundled third-party components (Python, Node.js, MingCute icons, the Poppins font, and others) remain under their original licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). The Qoder CN SDK's redistribution terms must be reviewed before any public release.
 
 ## 本地打包与发布维护 / Distribution maintenance
 
