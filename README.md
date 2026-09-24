@@ -1,219 +1,266 @@
-# Vibe Statistics
+<div align="center">
 
-原生 macOS Agent 额度与余额面板 · A native macOS dashboard for agent quotas and balances.
+  <img src="Resources/Branding/Creature.svg" width="96" height="96" alt="Vibe Statistics Icon" style="border-radius: 20px;" />
 
-[中文](#中文) | [English](#english)
+  # Vibe Statistics
 
-<a id="中文"></a>
-## 中文
+  **原生 macOS 菜单栏 AI Agent 额度与用量看板**  
+  *A sleek, privacy-first native macOS menu bar dashboard for coding agent quotas, balances & usage trends.*
 
-### 项目简介
+  <p align="center">
+    <a href="https://github.com/Niall-Young/Vibe-statistic/releases"><img src="https://img.shields.io/github/v/release/Niall-Young/Vibe-statistic?color=007AFF&label=Release&logo=apple" alt="Release" /></a>
+    <img src="https://img.shields.io/badge/Platform-macOS%2026%2B-000000?logo=apple&logoColor=white" alt="Platform" />
+    <img src="https://img.shields.io/badge/Arch-Apple%20Silicon%20(arm64)-555555?logo=apple&logoColor=white" alt="Architecture" />
+    <img src="https://img.shields.io/badge/Swift-6.0%20Toolchain%20(Swift%205%20Mode)-F05138?logo=swift&logoColor=white" alt="Swift Version" />
+    <img src="https://img.shields.io/badge/UI-SwiftUI%20%2B%20Nico%20Design-6C5CE7" alt="Design System" />
+    <img src="https://img.shields.io/badge/Privacy-100%25%20Local%20%7C%20Read--Only-10B981" alt="Privacy" />
+    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License" /></a>
+  </p>
 
-供本机使用的 SwiftUI + AppKit 菜单栏应用，统一查看 Codex、Kimi Code、Qoder CN（`qodercn`）、Claude Code / DeepSeek、Antigravity CLI。目标环境为 macOS 26、Apple Silicon。无需后台云服务。公开版构建与离线安装包流程已就绪，首发版本已通过 GitHub Releases 发布；尚未做 Developer ID 公证。
+  <p align="center">
+    <a href="#-中文文档">简体中文</a> •
+    <a href="#-english">English</a> •
+    <a href="https://github.com/Niall-Young/Vibe-statistic/releases">GitHub Releases</a> •
+    <a href="docs/NicoDesignSystem.md">原生设计系统说明</a>
+  </p>
 
-### 核心能力
+</div>
 
-- 内置完整 Nico 原生设计目录：45 个组件集、2,506 个变体、12 个独立组件，360 个变量及 69 个文字/图片/效果样式；CSS 变量映射为类型化 Swift token 与动态原生颜色，支持明暗及中英文字体模式。总览、详情、设置与菜单栏共用 Nico 按钮、状态标签、语义颜色与文字样式；搜索框和路径输入使用原生 Nico 输入组件，详情与菜单栏沿用分段额度条。业务页面的时间、指标与设置选项使用 Nico Select / Segmented，设置页使用统一卡片布局。设计目录仅开发可见，通过 `--nico-gallery` 离线预览浏览全部变体与交互示例；13 个原设计空白页明确标为空。详见 [原生设计系统说明](docs/NicoDesignSystem.md)。
-- 首页按 Nico Figma 设计使用原生 SwiftUI 实现：浅色白底、自定义 240 点平直侧栏与 52 点顶部栏、四块摘要、16 点圆角卡片与 20 段额度条；支持按 Agent 名称搜索和用量详情跳转。摘要依次显示本周 Token 用量、本月 Token 用量、总消耗量和当前 Agent（本机已检测到的数量）。Token 以万 token 显示输入 + 输出，仅覆盖 Claude Code / DeepSeek 本机日志：本周按本机时区从周一开始，本月为自然月，总量为现存日志累计，不代表全部 Agent 用量；旧快照需刷新后才有摘要，缺失数据不显示为零。宽窗口显示三列卡片，窄窗口自动换列。首页隐藏 Codex 附加 Credits 和错误说明，过期数据使用橙色标签；仅过期或连接失败的卡片显示「重试」以重新连接，详细错误和完整指标保留在详情页。
-- 菜单栏摘要、独立总览窗口、各 Agent 详情、7 / 30 天每日趋势与每日消耗视图、接入设置。菜单栏列出所有返回的额度窗口（包括 5 小时与每周）；菜单栏、总览和详情均显示服务提供的重置或到期时间，按本机时区显示，估算时间明确标注。
-- 五个 Agent 与查询服务分离：启动检测安装，只显示已安装项；未登录或查询失败仍显示提示。除 Antigravity 外，可选择现有官方接入、DeepSeek API 或智谱国内个人版 GLM Coding Plan；Claude Code 首版只支持后两者。应用只读取配置，不替用户修改 Agent 的模型服务。
-- 同一服务 Key 被多个 Agent 关联时合并查询与历史快照，标明共享账户额度；不能证明同账户的不同 Key 不合并，不跨账户汇总余额。缺失值不视为零。
-- 默认每 5 分钟刷新，支持 1 / 15 分钟；请求合并、失败退避、休眠暂停及唤醒刷新。
-- SwiftData 本地快照，默认保留 90 天，可改为 30 天；新增 Key / PAT 存入 macOS 钥匙串。
-- 原生深浅色（设置中切换跟随系统 / 浅色 / 深色，自动记住选择）、键盘操作、可访问性标签。开机启动默认关闭。
+---
 
-### 快速开始
+<a id="-中文文档"></a>
+## 🇨🇳 中文文档
 
-普通用户需要 macOS 26 / Apple Silicon，以及已安装的受支持 Agent。完整 `.app` 自带 Python、Node 和桥接依赖，无需 Xcode、npm 或另装运行时。安装包已通过 GitHub Releases 公开发布。
+### 💡 项目简介
 
-从 GitHub Releases 下载 ZIP（附同名 `.sha256` 可校验完整性），解压后将 `Vibe Statistics.app` 拖入「应用程序」，从访达打开。当前为 ad-hoc 签名、未公证；若系统阻止打开，在确认文件来源后按系统「隐私与安全性」中的提示允许此应用，不关闭 Gatekeeper。安装前先退出正在运行的旧版本；应用内可检查更新，也可手动下载新版覆盖，历史和偏好继续保留。
+**Vibe Statistics** 是一款专为 **macOS 26 / Apple Silicon** 打造的原生菜单栏用量统计面板。它采用 **SwiftUI + AppKit + SwiftData** 构建，帮助开发者在单个菜单栏窗口和原生面板中，一站式洞察本机各类 AI Coding Agent 的额度窗口、到期时间、账户余额与历史消耗趋势。
 
-开发构建需要 Xcode（默认 `/Applications/Xcode.app`）、Swift 6 工具链及 `/usr/bin/python3`；Swift Package 使用 Swift 5 语言模式。构建时联网下载校验过的运行时和锁定依赖：
+- 🛡️ **严格只读与纯本地**：无任何后台云端服务，不发起模型推理任务，不修改任何 Agent 的配置文件；
+- 📐 **忠于原生与专业设计**：完整内置 Nico 设计系统（2,500+ 原生变体与动态 Token），融合 MingCute 图标，完美适配 macOS 深浅色模式；
+- 📊 **严谨的数据哲学**：缺失数据绝不补零，估算时间明确标注，不同时区严格按本机转换，不把未知单价的 Token 或余额变动妄加折算为虚假费用。
+
+---
+
+### ✨ 核心特性
+
+- 🐾 **常驻菜单栏与全局总览**
+  - 点击菜单栏抽象小生物图标即可弹出快览卡片，实时掌握所有已连接 Agent 的额度状态；
+  - 拥有完整的独立总览大窗口，支持按 Agent 名称实时过滤与快捷搜索。
+- 🧩 **全套 Nico 原生设计系统**
+  - 45 个组件集、2,506 个变体、360 个变量及 69 种文本/特效样式；
+  - 包含平直侧边栏、52pt 紧凑顶部栏、20 段精确额度进度条与平滑色彩过渡；
+  - 可通过独立预览指令 `--nico-gallery` 离线体验全套设计组件库（详见 [原生设计系统说明](docs/NicoDesignSystem.md)）。
+- 📈 **科学严谨的趋势与消耗视图**
+  - **7 / 30 天每日趋势**：每根柱代表当日最后一次成功观测值，按账户与指标严格隔离，空缺日期不补零；
+  - **每日真实消耗视图**：仅统计同一额度窗口内（重置时间一致）相邻两次观测的下降绝对值；跨周期重置、充值与采集空白断档一律剔除；
+  - **本地 Token 统计**：专门解析 Claude Code / DeepSeek 的本地日志，按消息 ID 去重流式片段，分列输入、输出与缓存用量。
+- 🔐 **系统级安全隔离与沙盒保护**
+  - 凭据依托 **macOS 钥匙串（Keychain）**，后台轮询默认采用静默读取机制，绝不无故弹出授权弹窗骚扰；
+  - Python 桥接程序在 macOS **`sandbox-exec`** 沙盒内严格执行，物理级阻断访问桌面、文稿、下载及主目录 `.git` 等隐私路径。
+- ⚡ **智能调度与持久化**
+  - 默认 5 分钟定时刷新（支持 1 / 15 分钟切换）；
+  - 具备请求合并（Request Coalescing）、失败退避重试、系统休眠自动暂停与唤醒即时刷新；
+  - 本地快照依托 SwiftData 保存，默认留存 90 天（可调为 30 天），支持随时一键清除历史数据。
+
+---
+
+### 🤖 支持的 Agent 与数据来源
+
+应用启动或刷新时会自动探测本机环境，**仅展示已安装并在本机可用的 Agent**。未安装项不读取凭据、不发起查询。
+
+| Agent | 本机入口 / 机制 | 授权与数据来源 | 特性与隔离规则 |
+| :--- | :--- | :--- | :--- |
+| **Codex** | `~/.local/bin/codex` | 官方 app-server `account/read`、`account/rateLimits/read` | 复用 CLI 登录态；展示多段额度窗口与附加 Credits；严格限定读取 `~/.codex` |
+| **Kimi Code** | `~/.kimi-code/bin/kimi` | 本地回环临时/驻留 Server；GET OAuth usage / userinfo | 兼容旧版字段与新版 quota 结构；需先在 CLI 完成登录 |
+| **Qoder CN** | `~/.qoder-cn/entry/qodercn` | 官方 SDK `getUsageInfo()` 解析至 `qoderclicn` | 复用 CLI 登录态或用户填入的 PAT；SDK 锁定版本运行 |
+| **Claude Code** | `~/.claude/settings.json` | 官方 DeepSeek 余额接口 或 智谱 GLM Coding Plan 接口 | 纯读取配置；按 API Key 指纹隔离历史快照；换 Key 自动分区 |
+| **Antigravity** | `~/.local/bin/agy` | 后台伪终端（PTY）交互读取 `/usage` 与 `/credits` | 不触发推理任务；倒计时换算的重置时间明确标注为「估算」 |
+
+#### 🌐 扩展 API 查询来源
+
+| API 查询来源 | 调取接口与指标 | 适用范围说明 |
+| :--- | :--- | :--- |
+| **DeepSeek** | 官方 `/user/balance` 账户余额与赠金 | 可与 Codex、Kimi Code、Qoder CN、Claude Code 关联 |
+| **智谱 GLM Coding Plan** | 官方 `/api/monitor/usage/quota/limit` 剩余比例、调用次数及重置周期 | 适用于国内个人版 GLM Coding Plan（不含团队版/海外版） |
+
+> [!NOTE]
+> 同一个 API Key 被多个 Agent 关联时，系统会自动合并为单次查询，并标明共享额度；不同 Key 绝不跨账户汇总。
+
+---
+
+### 🚀 快速开始
+
+#### 方式一：直接安装（推荐）
+
+1. 前往 [GitHub Releases](https://github.com/Niall-Young/Vibe-statistic/releases) 下载最新版本的 ZIP 压缩包（例如 `Vibe-Statistics-v0.1.2-arm64.zip`）；
+2. 解压后将 `Vibe Statistics.app` 拖移至 macOS 的 **「访达」→「应用程序（/Applications）」** 目录；
+3. 从访达中双击打开。
+
+> [!TIP]
+> **关于系统安全提示**：由于首发版本采用 ad-hoc 签名且未做 Developer ID 公证，若系统拦截提示，请在确认下载完整性（可核对同名 `.sha256` 校验和）后，前往 macOS **「系统设置」→「隐私与安全性」**，点击 **「仍要打开」** 即可。无需关闭系统的 Gatekeeper。
+
+#### 方式二：从源码构建
+
+构建完整应用需满足：
+- 运行环境：macOS 26、Apple Silicon 芯片；
+- 开发工具：Xcode（默认安装于 `/Applications/Xcode.app`）、Swift 6 工具链（Swift Package 使用 Swift 5 语言模式）及系统内置 Python3。
 
 ```sh
+# 1. 克隆代码仓库
+git clone https://github.com/Niall-Young/Vibe-statistic.git
+cd Vibe-statistic
+
+# 2. 运行完整构建脚本（自动下载锁定的 Python/Node 依赖运行时并打包）
 ./scripts/build.sh '/Applications/Vibe Statistics.app'
-# 在访达的「应用程序」中双击 Vibe Statistics
+
+# 3. 在访达的「应用程序」中启动 Vibe Statistics
 ```
 
-构建脚本可接受应用输出路径；不传参数时输出到 `dist/Vibe Statistics.app`。安装前退出旧应用，避免从开发工具终端直接启动，以免再次关联菜单栏归属。桌面云同步属性可能导致签名失败，建议使用上述本机 Applications 路径。
+> [!IMPORTANT]
+> - 构建脚本默认会将可执行文件、Python/Node 离线辅助运行时和依赖完整封装到 `.app` 内部；
+> - 请避免直接在 IDE 终端内运行裸二进制文件，以免菜单栏归属被错误关联到终端工具。
 
-构建脚本按 `scripts/runtime-lock.json` 下载并校验 Apple Silicon Python / Node，安装锁定的 Qoder CN SDK、pyte / wcwidth / certifi，将辅助程序和依赖打包进 `.app`。各 Agent CLI 仍由用户自行安装。图标源文件为 `Resources/Branding/Creature.svg`：白底、黑色抽象无机小生物；构建生成完整 ICNS，菜单栏复用其轮廓。脚本签名嵌套可执行文件，并检查动态依赖、运行时 TLS 和离线桥接。
+---
 
-### 使用方法
+### ⌨️ 快捷键与操作指南
 
-点击菜单栏小生物图标查看摘要，点击 Agent 查看详情。主窗口支持 `⌘O` 打开、`⌘U` 显示摘要、`⌘R` 刷新、`⌘,` 设置、`⌘W` 关闭窗口和 `⌘Q` 退出。关闭主窗口后菜单栏继续运行。
+| 快捷键 | 功能操作 | 说明 |
+| :--- | :--- | :--- |
+| <kbd>⌘</kbd> + <kbd>O</kbd> | **打开主窗口** | 从任意状态呼出主应用总览面板 |
+| <kbd>⌘</kbd> + <kbd>U</kbd> | **切换摘要视图** | 聚焦查看顶部四大指标总览卡片 |
+| <kbd>⌘</kbd> + <kbd>R</kbd> | **立即刷新** | 触发所有可用 Agent 的数据拉取 |
+| <kbd>⌘</kbd> + <kbd>,</kbd> | **应用偏好设置** | 打开设置面板配置路径、刷新频率与凭据 |
+| <kbd>⌘</kbd> + <kbd>W</kbd> | **关闭当前窗口** | 关闭主窗口后，菜单栏图标依然在后台静默运行 |
+| <kbd>⌘</kbd> + <kbd>Q</kbd> | **完全退出** | 彻底退出应用及所有后台监控辅助任务 |
 
-趋势图每根柱是当天最后一次成功采集的观测值，按当前账户和指标隔离。首次使用没有之前的历史；空缺日期不补零，跨重置、充值与采集空档不推算消费。详情的消耗视图中，每根柱是当日相邻观测间同一额度窗口（重置时间一致，估算时间允许分钟级漂移）的下降合计，百分比窗口按百分点、Credits 按积分计；重置、充值与采集空档不计入，未观测到消耗的日期不显示为零；余额类指标不参与消耗视图，余额变化不等于消费。DeepSeek 展示整个账户余额及变化，不等同于 Claude Code 支出。Claude Code 详情还展示近 30 天本机 DeepSeek Token：按消息 ID 去重流式片段，分别统计输入、输出与缓存；该统计覆盖本机日志，不按当前 API Key 归因。缺乏历史价格和完整计费证据时不估算费用，不提供项目明细或多设备归因。
+---
 
-### 配置
+### 📊 数据口径与统计边界
 
-| Agent | 入口 | 授权与数据 |
-| --- | --- | --- |
-| Codex | `~/.local/bin/codex` | 官方 app-server `account/read`、`account/rateLimits/read`；复用 CLI 登录，显示实际返回的额度窗口与附加 Credits。始终读取 `~/.codex`，不继承外部 `CODEX_HOME` |
-| Kimi Code | `~/.kimi-code/bin/kimi` | 复用本地 Server 或临时启动仅监听回环地址的 Server；GET OAuth usage / userinfo，兼容本机旧字段和新 quota 字段 |
-| Qoder CN | `~/.qoder-cn/entry/qodercn` | SDK `getUsageInfo()`；自动解析到 `qoderclicn` 实际运行时，复用登录或使用用户填入的 PAT |
-| Claude Code / DeepSeek | `~/.claude/settings.json` | 仅接受 DeepSeek 官方 host，复用配置 Key 或用户填入的 Key，GET `/user/balance`；按 Key 指纹隔离历史 |
-| Antigravity | `~/.local/bin/agy` | 后台伪终端读取 `/usage` 与 `/credits`；不发模型任务、不修改 Credits 开关，倒计时换算的重置时间标为估算 |
+为了向开发者提供真实、严谨且不误导的数据，Vibe Statistics 严格遵守以下统计原则：
 
-#### API 查询来源
+> [!IMPORTANT]
+> 1. **非零原则**：当接口没有返回数据、网络中断或登录失效时，界面标记为“未知”或保留旧数据并加注“已过期”，**绝对不显示为假 0**；
+> 2. **周期隔离**：不同时区严格转换至当前 macOS 本机时区；通过倒计时逆推的到期时间明确标注为 **「估算时间」**；
+> 3. **真实消耗计算**：只有在 **同一个额度重置周期内** 的相邻两次有效采集，才会计算额度消耗降幅；跨周期的重置、充值回弹以及采集空档，一概不参与消耗计算；
+> 4. **余额不等于消耗**：账户余额变动可能受充值、赠券到期等多种因素影响，因此余额类指标不计入消耗走势图；缺少官方精准计费凭证前，绝不将未知单价的 Token 强行估算为金钱费用。
 
-| 查询来源 | 查询结果 | 适用范围 |
-| --- | --- | --- |
-| DeepSeek | 官方 `/user/balance` 余额；不提供基于余额变化的费用估算 | Codex、Kimi Code、Qoder CN、Claude Code 均可关联 |
-| 智谱 GLM Coding Plan | 官方 `/api/monitor/usage/quota/limit` 返回的剩余比例、次数及重置时间 | 国内个人版；同上四个 Agent 可关联 |
+---
 
-用量来源只决定本应用查询哪个账户，不验证或修改 Agent 的模型调用兼容性。Claude Code 可从 `~/.claude/settings.json` 的 HTTPS 官方地址自动识别服务；其他配置无法可靠识别时手动选择。显式选择优先，钥匙串 Key 优先于匹配的 Claude 配置；读取被拒绝时不回退到其他凭据。GLM 不支持团队版、海外 Z.ai 或任意中转地址；没有明确窗口或重置时间时保持未知，不反推 Token 总量。GLM 未返回重置时间时不计算消耗。
+### 🔒 安全、沙盒与凭据管理
 
-启动、打开窗口和「重新检测」会检查 CLI 安装；自定义路径无效时不悄悄换用另一安装。没有安装的 Agent 不展示、不读取凭据或查询，仅填写 Key 不算安装。卸载后保留历史，选中项回到总览。查询凭据按服务保存；同一个 Key 复用同一次请求，API 数据按服务及 Key 指纹隔离。Node 路径留空使用内置运行时。
+- 🔐 **静默凭据读取**：保存于 macOS Keychain 中的 API Key / PAT，仅在运行时常驻加密内存，设置或删除后即时同步，轮询刷新时阻断系统弹窗提示；
+- 📦 **严格进程沙盒**：底层负责调用的 Python 桥接程序使用 `sandbox-exec` 启动，系统沙盒策略阻断其触碰用户的 `~/Desktop`、`~/Documents`、`~/Downloads` 等个人目录；
+- 🛑 **无项目数据泄露**：查询工作空间限制在应用专属的安全目录，禁止 Git 向上回溯查找仓库，绝不读取用户项目的源码或对话上下文。
 
-可以在设置修改 CLI / Node 路径、添加或移除钥匙串凭据，并打开官方账户页面。登录流程仍由官方 CLI 完成，应用显示对应命令。Kimi 和 Antigravity 必须先在 CLI 完成登录。
+---
 
-数据位于 `~/Library/Application Support/VibeStatistics/`。`usage.store` 是历史数据库；`QueryWorkspace` 是只用于元数据查询的空目录。Antigravity 首次查询可能为这个目录确认 CLI workspace trust，绝不会为用户项目自动确认。查询子进程受超时和退出清理控制；CLI 自身可能产生常规登录或运行日志。应用不保存对话正文、账户明文或原始响应日志。DeepSeek 历史按 Key 区分，因此换 Key 会开启新的历史分区。
+### 🛠 项目架构
 
-### 项目结构
+```text
+Vibe-statistic/
+├── Sources/VibeStatistics/       # 核心 macOS 原生代码
+│   ├── DesignSystem/            # Nico 设计系统（原生组件、主题、语义 Token）
+│   ├── Providers/               # 5 个 Agent 及 API 渠道的只读查询协议
+│   ├── Storage/                 # SwiftData 本地快照与模型
+│   └── Views/                   # 菜单栏、总览、卡片与设置视图
+├── Resources/
+│   ├── Branding/                # 抽象小生物图标源文件 (Creature.svg)
+│   ├── AgentLogos/              # 各 Agent 官方品牌彩色与灰度 PNG 图标
+│   ├── MingCute/                # 内置 MingCute 图标库
+│   └── Nico/                    # Nico 设计规范原始设计资源
+├── Helpers/                     # Python 沙盒只读桥接器与锁定的依赖定义
+├── Tests/                       # 涵盖解析、安全沙盒、数据口径与 UI 测试
+├── docs/                        # 设计系统与业务进阶文档
+└── scripts/                     # 一键构建、打包发布与本地验证脚本
+```
 
-界面与菜单栏统一使用本地打包的 [MingCute Icons](https://github.com/mingcute-design/mingcute-icons)，通过模板着色适配深浅色。Agent 品牌 Logo 统一使用 `Resources/AgentLogos/` 中的完整 PNG；侧栏未选中时显示灰度，选中时显示品牌彩色，悬停显示菜单背景。应用图标保留独立设计。新增界面图标请使用 `MingCuteSymbol` / `MingCuteIcon`，资源及 Apache-2.0 许可位于 `Sources/VibeStatistics/Resources/MingCute/`。
-
-- `Sources/VibeStatistics/`：AppKit 生命周期、SwiftUI 界面、SwiftData 历史和 Provider 协议。`DesignSystem/` 提供 Nico 原生组件与类型化变量，原始设计资源位于 `Resources/Nico/`。
-- `Helpers/`：Python 只读桥接、Qoder CN 官方 SDK 包装、锁定的依赖声明。
-- `Tests/`：解析、错误处理、进程清理、历史口径及刷新状态测试。
-- `scripts/`：构建、图标生成、测试与本机验证。
-
-### 开发与验证
-
-设计系统可通过 `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift run VibeStatistics --nico-gallery` 单独离线预览，不访问账户或历史数据库；这是裸可执行文件仅用于设计预览的入口。复杂组件的全变体图层可查看，Button、输入框、Switch、Tag 和 Progress 提供原生交互封装。
+#### 本地验证与设计走廊
 
 ```sh
+# 运行单元测试（覆盖 Python 桥接与 Swift 模块）
 ./scripts/test.sh
-# 先退出正在运行的应用，再进行完整 .app 的真实只读验证
+
+# 独立启动离线设计走廊预览（无需任何凭据）
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift run VibeStatistics --nico-gallery
+
+# 运行只读真实验证
 ./scripts/verify.sh
 ```
 
-`verify.sh` 检查本地签名并启动完整 `.app`，查询本机已安装 Agent 的当前来源、保存快照，输出 `.local/verification/verification.json` 和界面几何报告。任一已安装 Provider 未接通或没有检测到安装即返回失败；该命令会调用官方额度接口但不调用模型。几何报告不能代替视觉验收，视觉与键盘交互应在实际原生窗口中检查。
+---
 
-2026-09-20 的本机接入已验证：Codex CLI 0.154.0、Kimi 0.42.0、Qoder CN CLI 1.1.43、Antigravity 1.2.7，以及 DeepSeek 官方余额接口。Antigravity 的 AI Credits 当前未启用，应用明确标记，不将其当成零。具体读数会变化，不写入源码。
+### ❓ 常见问题 (FAQ)
 
-### 常见问题
+<details>
+<summary><b>Q: 启动后在菜单栏找不到应用图标？</b></summary>
 
-- **应用运行但菜单栏无图标**：检查系统设置 → 菜单栏 → 允许在菜单栏显示 → Vibe Statistics。应用使用独立标识 `com.niallyoung.vibestatistics`，从访达或登录项启动；不需要开启 ChatGPT 菜单栏开关。旧开发标识曾被 macOS 26 错误关联到启动它的开发工具，因此改用独立标识并一次性迁移偏好设置，继续使用原历史数据库与钥匙串服务。原有开机启动需在新应用设置中重新开启。菜单栏位置会保存；`isVisible` 为真不代表图标实际在屏幕上。可设置该应用偏好 `statusDiagnosticsPath` 为绝对 JSON 路径，在从访达启动后读取图标窗口坐标与屏幕范围。
-- **登录失效或接口不可用**：保留旧读数并标明过期；检查 CLI 登录，再点击刷新。自动重试最多退避到 1 小时。
-- **个人文件夹权限弹窗**：额度查询不需要访问桌面、文稿、下载、图片、影片或音乐。Python 辅助程序通过 `sandbox-exec` 启动，系统沙盒禁止它及所有后代进程读写这些目录和主目录 `.git`；即使 CLI 丢弃环境变量或切换目录也不能访问。沙盒启动失败时查询报错，不降级为无沙盒执行。所有辅助进程（包括版本探测）使用应用专属查询目录，并限制 Git 向上查找仓库，防止主目录仓库触发个人目录扫描；不继承外部 `GIT_*` 仓库环境变量。
-- **CLI 更新后查询失败**：Qoder SDK 和 Antigravity TUI 都有版本边界；不猜测无法识别的新格式。检查连接提示与 CLI 版本。
-- **钥匙串需要授权**：应用自身读取 Key / PAT 时默认禁止授权弹窗，包括自动刷新、手动刷新和打开设置。已读取的凭据仅在本次运行的内存中复用；保存或移除后立即更新。静默读取同时关闭旧式登录钥匙串和 Data Protection 钥匙串的交互。无法读取时保留旧数据并显示提示，本次运行停止后台重复读取，直到主动授权或保存凭据，不会改用其他账户凭据；在设置中主动点击「授权读取凭据」即可允许系统授权。本地 ad-hoc 重新构建后可能需要再次主动授权。官方 CLI 自身的登录或钥匙串提示由对应 CLI 管理。
-- **开机启动失败**：注册可能需要在系统设置的登录项中批准。没有静默降低系统保护。
-- **没有费用估算**：当前仅提供可靠的官方额度、Credits 与余额，不把余额差额、订阅百分比或 Token 按不明价格换算成费用。
-- **本机依赖缺失**：确认 Agent CLI 路径；Node 自定义路径可清空以恢复内置版本。运行时损坏时重新安装完整 `.app`；不能只复制裸可执行文件。
+请前往 macOS **「系统设置」→「控制中心」/「菜单栏」**，确认 **「Vibe Statistics」** 是否已被开启并允许在菜单栏显示。应用使用独立标识 `com.niallyoung.vibestatistics`，建议直接从「访达」中的「应用程序」启动。
+</details>
 
-### 开源协议
+<details>
+<summary><b>Q: 为什么某些 Agent 始终显示未连接或过期？</b></summary>
 
-项目源码以 [MIT License](LICENSE) 发布。打包的第三方组件（Python、Node.js、MingCute 图标、Poppins 字体等）保留各自原有协议，详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)；其中 Qoder CN SDK 的再分发条件需在公开发布前复核。
+Vibe Statistics 采用只读方式探测。请先确保该 Agent 自身的官方 CLI 已在本机正确安装并处于已登录状态（例如先在终端运行 `codex login` 或 `kimi login`）。
+</details>
 
-<a id="english"></a>
-## English
+<details>
+<summary><b>Q: 提示需要钥匙串授权？</b></summary>
 
-### Overview
+应用默认静默读取凭据，若 macOS 因系统更新或 ad-hoc 重签名导致权限变更，可在 Vibe Statistics「设置」页面中主动点击 **「授权读取凭据」** 完成一次系统批准即可。
+</details>
 
-A personal SwiftUI + AppKit menu bar application for Codex, Kimi Code, Qoder CN (`qodercn`), Claude Code / DeepSeek, and Antigravity CLI. Targets macOS 26 on Apple Silicon. No cloud backend. Distribution builds are prepared and the first version has been published on GitHub Releases; Developer ID notarization is not included.
+---
 
-### Features
+<a id="-english"></a>
+## 🌐 English
 
-- Includes the Nico native design catalog: 45 component sets, 2,506 variants, 12 standalone components, 360 variables, and 69 text/paint/effect styles. CSS variables map to typed Swift tokens and dynamic native colors, with light/dark and Chinese/English typography modes. Overview, details, settings, and the menu bar share Nico buttons, status tags, semantic colors, and typography; search and path fields use native Nico inputs, while details and the menu bar use segmented quota bars. Business screens use Nico Select / Segmented controls for periods, metrics, and preferences, with a shared card layout in Settings. The catalog is development-only: it has no in-app entry and is opened through the `--nico-gallery` offline preview; 13 empty source pages are marked explicitly. See the [native design system guide](docs/NicoDesignSystem.md).
-- The home screen implements the Nico Figma design in native SwiftUI: a white light-mode surface, custom flat 240-point sidebar and 52-point header, four summaries, 16-point card corners, and 20-segment quota bars. Search filters agents by name and cards open usage details. Summaries show this week’s tokens, this month’s tokens, total tokens, and the current agent count (detected installations). Input plus output tokens are displayed in units of 10,000 and cover only local Claude Code / DeepSeek logs: weeks start on Monday in the local time zone, months are calendar months, and totals cover all surviving logs, not all agents. Older snapshots require a refresh for these summaries; missing data is not shown as zero. Wide windows show three card columns; narrow windows reflow automatically. The overview hides supplemental Codex credits and error descriptions, marks stale data with an orange tag, and provides a Retry button only for stale or failed connections. Full metrics and error details remain on the detail screen.
-- Menu bar summary, overview window, provider details, 7 / 30-day daily observations with a daily consumption view, and connection settings. The menu lists every returned quota window, including five-hour and weekly limits. The menu, overview, and details show service-provided reset or expiry times in the local time zone, with estimated times explicitly labeled.
-- Five installed agents, with independent query sources. Except Antigravity, agents can be linked to DeepSeek or mainland personal GLM Coding Plan; Claude Code supports those two sources in this version. Shared service keys produce one query and one snapshot. Missing values are never treated as zero.
-- Five-minute refresh by default, with 1 / 15-minute options; request coalescing, retry backoff, sleep suspension, and wake refresh.
-- SwiftData snapshots retained for 90 days by default, optionally 30 days; additional keys / PATs stored in macOS Keychain.
-- Native light / dark appearance (choose System / Light / Dark in Settings; the choice is remembered), keyboard access, and accessibility labels. Launch at login is off by default.
+### 💡 Overview
 
-### Quick Start
+**Vibe Statistics** is a lightweight, privacy-first native macOS menu bar application designed for **macOS 26 & Apple Silicon**. Built on **SwiftUI, AppKit, and SwiftData**, it gives developers a central dashboard to monitor quotas, reset windows, and balances across Codex, Kimi Code, Qoder CN, Claude Code / DeepSeek, and Antigravity CLI.
 
-Users need macOS 26 on Apple Silicon and an installed supported Agent. The complete app includes Python, Node and bridge dependencies; Xcode and npm are not required. Downloads are on GitHub Releases, each ZIP shipping a sibling `.sha256`. Updates are manual: quit the old app, replace it in Applications and reopen it; the app can also check for updates itself. History and preferences are retained.
+---
 
-For source builds, use Xcode (default `/Applications/Xcode.app`), the Swift 6 toolchain and `/usr/bin/python3`. The package uses Swift 5 language mode. Runtime downloads and dependencies are verified/pinned by the build scripts.
+### ✨ Features
 
+- 🖥️ **Native macOS Experience**: Runs quietly in your menu bar with an abstract creature icon; opens an overview window with keyboard shortcuts (<kbd>⌘O</kbd>, <kbd>⌘R</kbd>, <kbd>⌘,</kbd>);
+- 🎨 **Nico Native Design System**: 45 component sets, 2,506 variants, and 360 dynamic design tokens; supports native light/dark appearance and MingCute icon set;
+- 📊 **Strict Metric Semantics**: Missing data is never coerced to zero. Estimated reset times are explicitly labeled. Drops are summed strictly within the same quota window;
+- 🔒 **Zero Telemetry & Local Sandbox**: Runs 100% locally with zero cloud backend. Helper processes run inside an explicit macOS `sandbox-exec` sandbox, strictly denied access to personal directories (`~/Desktop`, `~/Documents`, `~/Downloads`, etc.);
+- 🔑 **Keychain Integration**: Credentials are stored securely in the native macOS Keychain with silent background reads that prevent disruptive system popups.
+
+---
+
+### 🤖 Supported Agents & Providers
+
+| Agent | CLI / Host Entry | Auth & Data Channel | Details |
+| :--- | :--- | :--- | :--- |
+| **Codex** | `~/.local/bin/codex` | App-server `account/read` & `rateLimits/read` | Reuses CLI session; shows rate limit windows & credits |
+| **Kimi Code** | `~/.kimi-code/bin/kimi` | Loopback local server; OAuth usage/userinfo | Compatible with both legacy and new quota fields |
+| **Qoder CN** | `~/.qoder-cn/entry/qodercn` | Official SDK `getUsageInfo()` | Reuses CLI login or personal access token (PAT) |
+| **Claude Code** | `~/.claude/settings.json` | DeepSeek balance API or GLM Coding Plan | Read-only; isolated snapshots per API key fingerprint |
+| **Antigravity** | `~/.local/bin/agy` | Background PTY session (`/usage`, `/credits`) | Non-intrusive; marks reset countdowns as estimated |
+
+---
+
+### 🚀 Getting Started
+
+1. Download the latest release `.zip` from [GitHub Releases](https://github.com/Niall-Young/Vibe-statistic/releases);
+2. Unzip and drag `Vibe Statistics.app` into your **Applications** folder;
+3. Double-click to launch from Finder.
+
+> [!NOTE]
+> Since early builds are ad-hoc signed, if macOS displays a security prompt on first launch, go to **System Settings → Privacy & Security** and click **Open Anyway**.
+
+#### Source Build
 ```sh
+# Build full application bundle with bundled dependencies
 ./scripts/build.sh '/Applications/Vibe Statistics.app'
-# Double-click Vibe Statistics in Finder → Applications
 ```
 
-The build script accepts an app output path; without an argument it writes `dist/Vibe Statistics.app`. Quit the old app before installing, and avoid launching directly from a development tool terminal to prevent menu bar attribution from recurring. Desktop cloud-sync attributes can cause signing failures; prefer the local Applications path above.
+---
 
-The build script bundles checksum-pinned Apple Silicon Python and Node, the locked Qoder CN SDK, pyte, wcwidth and certifi. Agent CLIs remain user-installed. The editable icon is the white/black abstract creature in `Resources/Branding/Creature.svg`. Nested code is ad-hoc signed and checked for portable dependencies; Developer ID signing and notarization are not performed.
+### 📜 开源协议 / License
 
-### Usage
-
-Click the menu bar chart icon for the summary, then an agent for details. In the main application, use `⌘O` to open the window, `⌘U` for the summary, `⌘R` to refresh, `⌘,` for settings, `⌘W` to close the window, and `⌘Q` to quit. Closing the main window leaves the menu bar app running.
-
-Each chart bar is the final successful observation for that day, isolated by current account and metric. No earlier history exists on first use; missing days stay absent. Resets, top-ups, and collection gaps are not converted into spending. In the detail consumption view, each bar sums drops between consecutive observations inside the same quota window (matching reset times, with minute-level tolerance for estimated ones), counted in percentage points for quota windows and in credits for credit buckets. Resets, top-ups, and collection gaps are excluded; days without an observed drop are not shown as zero. Balance metrics are excluded from the consumption view because a balance change is not necessarily consumption. DeepSeek shows the entire account balance and its changes, not Claude Code's bill. Claude Code details also show 30-day local DeepSeek tokens, deduplicating streaming fragments by message ID and separating input, output, and cache usage. These statistics cover local logs and are not attributed to the current API key. Historical pricing and complete billing evidence are unavailable, so there are no cost estimates, project breakdowns, or cross-device attribution.
-
-### Configuration
-
-| Agent | Entry point | Authentication and data |
-| --- | --- | --- |
-| Codex | `~/.local/bin/codex` | Official app-server `account/read` and `account/rateLimits/read`; reuses CLI login and displays returned quota windows and extra Credits. Always reads `~/.codex`; an ambient `CODEX_HOME` is ignored |
-| Kimi Code | `~/.kimi-code/bin/kimi` | Reuses a local Server or temporarily starts a loopback-only Server; GET OAuth usage / userinfo, supporting the installed legacy fields and new quota fields |
-| Qoder CN | `~/.qoder-cn/entry/qodercn` | SDK `getUsageInfo()`; resolves the dispatcher to the actual `qoderclicn` runtime, using CLI login or an explicitly entered PAT |
-| Claude Code / DeepSeek | `~/.claude/settings.json` | Accepts only the official DeepSeek host; uses the configured or entered key for GET `/user/balance`, isolating history by key fingerprint |
-| Antigravity | `~/.local/bin/agy` | Background PTY for `/usage` and `/credits`; no model prompts or credit-setting changes; countdown-derived reset times are marked estimated |
-
-Settings support CLI / Node paths, adding or removing service-scoped Keychain credentials, and official account links. An empty Node path uses the bundled runtime. Installed agents remain visible when authentication fails; absent agents are neither queried nor shown. Claude Code can detect exact official HTTPS DeepSeek or mainland GLM hosts from its global settings; otherwise users explicitly select the query source. This does not edit Agent configuration or promise model API compatibility.
-
-DeepSeek exposes account balances. Mainland personal GLM Coding Plan exposes quota percentages/counts through the official monitor endpoint; unknown windows and reset times stay unknown. GLM windows without reset times do not participate in consumption charts. Overseas Z.ai, team plans and other custom APIs are not supported. Official CLIs own the login flow; the application displays the appropriate commands. Kimi and Antigravity require an existing CLI login.
-
-Data lives under `~/Library/Application Support/VibeStatistics/`. `usage.store` contains history; `QueryWorkspace` is an empty metadata-query workspace. On first use, Antigravity may confirm CLI workspace trust for this directory only, never for user projects. Subprocesses have timeouts and exit cleanup; the CLIs themselves may produce their usual login or runtime logs. The application does not persist conversation text, plaintext account identities, or raw response logs. Changing a DeepSeek key starts a separate history partition.
-
-### Project Structure
-
-The interface and menu bar use locally bundled [MingCute Icons](https://github.com/mingcute-design/mingcute-icons), rendered as template images for light and dark appearances. Agent brand logos use the complete PNG assets in `Resources/AgentLogos/` throughout the app. Sidebar logos are grayscale when unselected and retain their brand colors when selected; hovering highlights the menu row. The application icon keeps its own design. Use `MingCuteSymbol` / `MingCuteIcon` for new interface icons; assets and the Apache-2.0 license live in `Sources/VibeStatistics/Resources/MingCute/`.
-
-- `Sources/VibeStatistics/`: AppKit lifecycle, SwiftUI views, SwiftData history, and the Provider protocol. `DesignSystem/` contains native Nico components and typed tokens; original design resources live in `Resources/Nico/`.
-- `Helpers/`: read-only Python bridge, official Qoder CN SDK wrapper, and pinned dependency declarations.
-- `Tests/`: parsers, error handling, process cleanup, history semantics, and refresh-state tests.
-- `scripts/`: build, icon generation, tests, and local verification.
-
-### Development and Verification
-
-Preview the design system offline with `DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer swift run VibeStatistics --nico-gallery`; this preview-only executable entry does not access accounts or the history database. All complex component variants are available as native layer views; Button, text fields, Switch, Tag, and Progress also have native interaction wrappers.
-
-```sh
-./scripts/test.sh
-# Quit the running application before real read-only verification of the complete .app
-./scripts/verify.sh
-```
-
-`verify.sh` checks the local signature, launches the complete `.app`, queries the selected sources of installed agents, persists snapshots, and writes `.local/verification/verification.json` plus UI geometry reports. It fails if no agents are detected or any installed agent is disconnected. It calls official quota endpoints without model inference. Geometry reports do not replace visual acceptance; check visual and keyboard behavior in the actual native windows.
-
-Local integrations were verified on 2026-09-20 using Codex CLI 0.154.0, Kimi 0.42.0, Qoder CN CLI 1.1.43, Antigravity 1.2.7, and the official DeepSeek balance endpoint. AI Credits are currently disabled in Antigravity; the application reports that explicitly instead of showing zero. Live values change and are not committed to source.
-
-### Troubleshooting
-
-- **Running app with no menu bar icon**: check System Settings → Menu Bar → Allow in the Menu Bar → Vibe Statistics. The app uses the independent identifier `com.niallyoung.vibestatistics`; launch through Finder or its login item. The ChatGPT menu bar switch can stay off. macOS 26 had incorrectly associated the old development identity with its launching development tool, so the new identity migrates preferences once and keeps the existing history database and Keychain service. Re-enable any previous launch-at-login preference in the new app. Menu bar placement is preserved; `isVisible` alone does not prove the icon is on screen. Set the app preference `statusDiagnosticsPath` to an absolute JSON path to record icon window coordinates and screen bounds after a Finder launch.
-- **Expired login or unavailable service**: previous values remain marked stale. Check CLI authentication and refresh. Automatic retries back off to at most one hour.
-- **Personal-folder permission prompts**: quota queries do not need Desktop, Documents, Downloads, Pictures, Movies, or Music. The Python bridge runs through `sandbox-exec`; its system sandbox denies it and every descendant read/write access to those folders and the home `.git`, even if a CLI drops environment variables or changes directories. Sandbox launch failures fail the query without an unsandboxed fallback. All helper processes, including version probes, use the app-owned query directory with a Git discovery ceiling so a home-directory repository cannot trigger personal-folder scans. External `GIT_*` repository environment variables are not inherited.
-- **Failure after a CLI update**: Qoder SDK and Antigravity TUI have version boundaries; unknown formats are not guessed. Inspect the connection message and CLI version.
-- **Keychain authorization required**: the app suppresses authentication dialogs when reading keys / PATs during automatic refresh, manual refresh, and opening settings. Successfully read credentials are reused only in memory for the current run and updated immediately after saving or removing them. Silent reads suppress interaction for both the legacy login keychain and the Data Protection keychain. If access fails, previous data is retained with a status message; background reads stop for the current run until explicit authorization or saving credentials, instead of falling back to another account. Click “授权读取凭据” in settings to explicitly allow system authorization. A local ad-hoc rebuild may require another explicit authorization. Login or Keychain prompts initiated by official CLIs remain managed by those CLIs.
-- **Launch-at-login failure**: registration may require approval in System Settings. System protections are not silently weakened.
-- **No cost estimate**: only reliable official quotas, Credits, and balances are shown. Balance differences, subscription percentages, and tokens without known pricing are not converted into spending.
-- **Missing dependencies**: check Agent CLI paths and clear custom Node overrides to use the bundled runtime. Reinstall the complete app if bundled resources are damaged; copying a bare executable is insufficient.
-
-### License
-
-The project source is released under the [MIT License](LICENSE). Bundled third-party components (Python, Node.js, MingCute icons, the Poppins font, and others) remain under their original licenses; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). The Qoder CN SDK's redistribution terms must be reviewed before any public release.
-
-## 本地打包与发布维护 / Distribution maintenance
-
-```sh
-./scripts/test.sh
-VIBE_VERSION=0.1.0 VIBE_BUILD=1 ./scripts/build.sh
-./scripts/package-release.sh
-```
-
-`package-release.sh` 只在 `dist/` 生成 ZIP 和 SHA-256，不创建或发布 GitHub Release；发布是单独的手动步骤（`gh release create v<版本> --target main`，并把 ZIP 与 `.sha256` 一起作为资产上传，资产名须保持 `*-arm64.zip` 与对应的 `*.zip.sha256`，否则应用内更新检查找不到）。`.github/workflows/build.yml` 支持手动构建或版本标签触发，仅上传 Actions artifact，权限为只读，不发布 Release。发布前需检查仓库历史与 `THIRD_PARTY_NOTICES.md` 中的资源再分发条件。
-
-Offline UI fixtures: open the complete app with `--offline-preview` (two installed agents sharing GLM demo data), or add `--preview-empty` (no installed agents). These modes use an in-memory database and fake credentials, never live accounts. `scripts/check-bundle.py` validates signatures, architecture, dynamic dependencies, bundled TLS and an offline helper request; it does not replace testing on a separate clean Mac.
-
-### 菜单栏验证注意 / Menu bar verification
-
-`--verify-ui`、`--offline-preview` 和设计目录预览不创建或注册真实菜单栏项目。macOS 26 可能将开发工具直接启动的菜单栏项目长期关联到该工具，导致它跟随开发工具的菜单栏开关隐藏。正常运行请从访达启动完整应用；几何和图像测试不能替代实际菜单栏显示及点击验收。
-
-`--verify-ui`, `--offline-preview`, and the design gallery do not register a real status item. macOS 26 can persistently attribute status items launched by development tools to those tools. Launch the normal app through Finder, and verify the actual menu bar icon and click interaction separately from geometry and image tests.
+本项目源码基于 [MIT License](LICENSE) 授权开源。  
+项目中所包含的第三方组件（Python、Node.js、MingCute 图标、Poppins 字体等）遵循各自原始开源许可，详见 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)。
